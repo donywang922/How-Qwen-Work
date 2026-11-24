@@ -1,0 +1,19 @@
+How Qwen Work
+Copyright 2026 How Qwen Work contributors.
+
+Original project code, documentation, procedural scene content, and the
+project-owner-provided Qwen standee and orbital-ring artwork are licensed under
+the Apache License, Version 2.0. See LICENSE.
+
+Third-party components retain their own licenses. In particular:
+- ShaderGPT: MIT, copyright lox9973; vendored in Assets/ThirdParty/ShaderGPT.
+- Qwen3.5 model data: upstream Apache-2.0; generated payloads are not included
+  in the source archive. The upstream model license is retained in Assets/QwenWorld/Licenses.
+- Noto Sans CJK: SIL Open Font License 1.1; see Assets/QwenWorld/Fonts/OFL.txt.
+- NASA / ESA-Gaia imagery: separate source credits and media terms; see
+  Assets/QwenWorld/Environment/SkySources.txt and THIRD_PARTY_NOTICES.md.
+- VRChat SDK and UdonSharp are restored through Creator Companion; SDK copies
+  and local utility/cache folders are not distributed in the source archive.
+
+Qwen, VRChat and agency names/logos identify upstream sources. This project
+claims no affiliation or endorsement and grants no third-party trademark rights.

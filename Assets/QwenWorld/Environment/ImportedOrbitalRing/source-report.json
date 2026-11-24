@@ -1,0 +1,87 @@
+{
+  "mesh_objects": 1,
+  "material_slots": 1,
+  "material_datablocks": 1,
+  "source_triangles": 474944,
+  "rebuilt_triangles_before_final_adjustment": 19954,
+  "triangles": 19954,
+  "vertices": 29482,
+  "polygons": 19954,
+  "reduction_percent": 95.8,
+  "textures_packed": true,
+  "texture_resolution": [
+    4096,
+    4096
+  ],
+  "mesh_validated": true,
+  "construction_parts": 4726,
+  "simplification": "no unique part culling; lower cross-sections and thickness only",
+  "source_construction_calls": 5014,
+  "unique_components_retained": 4726,
+  "coincident_duplicates_removed": 288,
+  "budget_trials": [
+    {
+      "minor_pipe_segments": 60,
+      "major_pipe_segments": 84,
+      "triangles": 23410,
+      "parts": 4726,
+      "exact_duplicate_sleeves": 288
+    },
+    {
+      "minor_pipe_segments": 56,
+      "major_pipe_segments": 80,
+      "triangles": 22834,
+      "parts": 4726,
+      "exact_duplicate_sleeves": 288
+    },
+    {
+      "minor_pipe_segments": 52,
+      "major_pipe_segments": 76,
+      "triangles": 22258,
+      "parts": 4726,
+      "exact_duplicate_sleeves": 288
+    },
+    {
+      "minor_pipe_segments": 48,
+      "major_pipe_segments": 72,
+      "triangles": 21682,
+      "parts": 4726,
+      "exact_duplicate_sleeves": 288
+    },
+    {
+      "minor_pipe_segments": 44,
+      "major_pipe_segments": 68,
+      "triangles": 21106,
+      "parts": 4726,
+      "exact_duplicate_sleeves": 288
+    },
+    {
+      "minor_pipe_segments": 40,
+      "major_pipe_segments": 64,
+      "triangles": 20530,
+      "parts": 4726,
+      "exact_duplicate_sleeves": 288
+    },
+    {
+      "minor_pipe_segments": 36,
+      "major_pipe_segments": 60,
+      "triangles": 19954,
+      "parts": 4726,
+      "exact_duplicate_sleeves": 288
+    }
+  ],
+  "primitive_calls": {
+    "rail": 936,
+    "tube": 1848,
+    "panel": 2024,
+    "band": 78
+  },
+  "glb_verification": {
+    "meshes": 1,
+    "materials": 1,
+    "primitives": 1,
+    "triangles": 19954,
+    "emission_texture": true,
+    "double_sided": true
+  }
+}

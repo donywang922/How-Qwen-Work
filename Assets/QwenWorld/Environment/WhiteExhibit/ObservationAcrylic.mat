@@ -1,0 +1,50 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: ObservationAcrylic
+  m_Shader: {fileID: 4800000, guid: ccfac579be84d9440a374d0578f0ee18, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _BrushDirectionMap:
+        m_Texture: {fileID: 2800000, guid: 767c368422ba4584eafa9a0e4178483a, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DetailTex:
+        m_Texture: {fileID: 2800000, guid: 955c3849df1e86c47b02d92cfb684c63, type: 2}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _BrushAnisotropy: 0.8
+    - _BrushGrainStrength: 0.015
+    - _BrushReflectance: 0.04
+    - _FloorSpecular: 1
+    - _GridStrength: 0.06
+    - _HexSize: 1.662769
+    - _LineWidth: 0.008
+    - _Opacity: 0.095
+    - _Smoothness: 0.82
+    m_Colors:
+    - _BrushGrainScale: {r: 1.7, g: 0.035, b: 0, a: 0}
+    - _Color: {r: 0.1, g: 0.19, b: 0.24, a: 1}
+    - _HexWorldSize: {r: 25.92, g: 24.94153, b: 0, a: 0}
+    - _LineColor: {r: 0.26999995, g: 0.56, b: 0.7, a: 1}
+  m_BuildTextureStacks: []

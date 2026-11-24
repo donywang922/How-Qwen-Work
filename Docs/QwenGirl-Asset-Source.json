@@ -1,0 +1,25 @@
+{
+  "toolMode": "built-in image_gen",
+  "outputs": {
+    "open": "Assets/QwenWorld/Environment/QwenGirl/QwenGirl-Open.png",
+    "closed": "Assets/QwenWorld/Environment/QwenGirl/QwenGirl-Closed.png",
+    "prefab": "Assets/QwenWorld/Environment/QwenGirl/QwenGirl.prefab",
+    "shader": "Assets/QwenWorld/Shaders/Environment/QwenGirlStandee.shader"
+  },
+  "prompts": {
+    "open": "Use case: background-extraction. Edit target: the supplied full-body Qwen anime girl illustration. Extract the EXACT existing character onto a genuinely transparent alpha background for a Unity life-size flat standee. Only remove the exterior white background and enclosed background gaps between hair locks, fan and hand, body and accessories. Preserve all white clothing, skin, white hair ornaments, fan art, jewelry, tassels, shoes and soft antialiased drawn contours. Preserve her eyes OPEN, original small smile, identity, pose, every costume pattern, original blue violet ivory colors, original linework and entire head-to-toe framing. Do not redesign, repaint, add highlights, add a pedestal, invent backing plastic, add a sticker outline, add a shadow, crop or add text. Keep same portrait composition, body proportions and canvas aspect. Real transparency, not a white or checkerboard backdrop.",
+    "closed": "Use case: precise-object-edit, expression variant for an aligned Unity standee texture. IMAGE 1 is the ONLY EDIT TARGET: transparent full-body Qwen girl cutout. IMAGE 2 is only a reference for closed eyes and a closed-mouth soft smile. Make a strictly tiny LOCAL change to Image 1's face: close both eyes naturally with relaxed eyelids and eyelashes and change mouth to gentle CLOSED-MOUTH smile. No irises, no teeth, no mouth interior. Preserve Image 1 exact canvas size and aspect ratio, character scale, placement, silhouette, alpha transparency, pose, head tilt, facial proportions, hair, hat, fan, sleeves, hands, skirt, bag, tassels, shoes, all linework and all colors. Every region outside the eyes and mouth should remain unchanged. Do NOT replace the body with Image 2, do not reframe, crop, move the figure, add backdrop or floor or sticker outline. This must register with Image 1 for expression swapping. Actual transparent background including holes in hair."
+  },
+  "rendering": {
+    "body": "Always sample open texture for body and alpha; blend closed reference only within the feathered face patch.",
+    "visibleHeightMeters": 1.75,
+    "triangles": 2,
+    "doubleSided": true,
+    "billboard": false,
+    "expressionProperty": "_EyesClosed",
+    "platformSettings": "PC: 1024x2048 DXT5 with mips, verified in Unity. Android: max 1024 ASTC 6x6 configured; device rendering not tested.",
+    "runtimeModeBinding": "QwenComputeDisplay binds _EyesClosed to globally synchronized texture visibility."
+  },
+  "origin": "Project-owner-provided generated character illustration, extracted and locally edited for this world.",
+  "license": "Apache-2.0, authorized by the project owner for this standee artwork."
+}

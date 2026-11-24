@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Bars
+  m_Shader: {fileID: 4800000, guid: ac2c1b061016ae545a8f250727aea846, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs: []
+    m_Ints: []
+    m_Floats:
+    - _BusyBlend: 0
+    - _MotionTime: 0
+    - _OrbitBusyTime: 0
+    - _OrbitIdleTime: 0
+    - _ShowBlend: 0
+    - _ThemeReflection: 0.8
+    m_Colors:
+    - _GlowColor: {r: 1.15, g: 1.15, b: 1.15, a: 1}
+    - _ThemeAmbient: {r: 0.3, g: 0.34, b: 0.42, a: 1}
+    - _ThemeCool: {r: 0.07, g: 0.16, b: 0.3, a: 1}
+    - _ThemeLed: {r: 0.26, g: 0.46, b: 0.85, a: 1}
+    - _ThemeWarm: {r: 1.4, g: 1.25, b: 1.1, a: 1}
+  m_BuildTextureStacks: []

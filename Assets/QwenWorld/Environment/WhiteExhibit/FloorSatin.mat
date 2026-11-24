@@ -1,0 +1,54 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: FloorSatin
+  m_Shader: {fileID: 4800000, guid: 8b67a8a7b465150439d67a41f194f7f4, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _BrushDirectionMap:
+        m_Texture: {fileID: 2800000, guid: 767c368422ba4584eafa9a0e4178483a, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DetailTex:
+        m_Texture: {fileID: 2800000, guid: 955c3849df1e86c47b02d92cfb684c63, type: 2}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _LogoRelief:
+        m_Texture: {fileID: 2800000, guid: 328b4704cbead7f478943029c168dedf, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _BrushAnisotropy: 0.9
+    - _BrushGrainStrength: 0.025
+    - _BrushReflectance: 0.06
+    - _FloorSpecular: 1
+    - _LogoNormalStrength: 0.2
+    - _LogoSize: 7.2
+    - _LogoSmoothness: 0.72
+    - _LogoStrength: 1
+    - _Smoothness: 0.64
+    m_Colors:
+    - _BrushGrainScale: {r: 1.2, g: 0.035, b: 0, a: 0}
+    - _Color: {r: 0.83, g: 0.81, b: 0.77, a: 1}
+    - _HexWorldSize: {r: 25.92, g: 24.941532, b: 0, a: 0}
+    - _LogoCentre: {r: 0, g: 0, b: 0, a: 0}
+  m_BuildTextureStacks: []
