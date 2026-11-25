@@ -1,5 +1,6 @@
 using UdonSharp;
 using UnityEngine;
+using VRC.SDKBase;
 
 namespace QwenWorld
 {
@@ -20,9 +21,11 @@ namespace QwenWorld
         private float[] layerExpiry = new float[24];
         private bool initialized, dirty, wasPaused;
         private int previewPass = -1, lastMask = -1;
-        private bool lastBusy, lastPaused;
+        private bool lastBusy, lastPaused, lastDetailed;
         private float nextPublish, showBlend, busyBlend, motionTime, orbitIdleTime, orbitBusyTime;
         private float nextHeartbeat;
+        private float hiddenAnimationClock;
+        private int lastStateOwner = -1;
         public void Start()
         {
             Initialize();
@@ -151,6 +154,7 @@ namespace QwenWorld
             if (exhibit == null || controller == null || runner == null)
                 return;
             bool local = controller.IsLocalExecutionOwner();
+            if (!local) lastMask = -1;
             int mask = 0;
             if (local && runner.running)
             {
@@ -187,18 +191,38 @@ namespace QwenWorld
             }
 
             bool busy = local && runner.running, paused = busy && runner.paused;
-            if (local && Time.unscaledTime >= nextPublish && (mask != lastMask || busy != lastBusy || paused != lastPaused || Time.unscaledTime >= nextHeartbeat))
+            bool detailed = exhibit.texturesShown;
+            int publishedMask = detailed ? mask : 0;
+            var stateOwner = Networking.GetOwner(exhibit.gameObject);
+            int stateOwnerId = Utilities.IsValid(stateOwner) ? stateOwner.playerId : -1;
+            bool stateChanged = lastMask < 0 || busy != lastBusy || paused != lastPaused || detailed != lastDetailed || stateOwnerId != lastStateOwner;
+            bool layerChanged = detailed && (publishedMask != lastMask || Time.unscaledTime >= nextHeartbeat);
+            if (local && (stateChanged || (Time.unscaledTime >= nextPublish && layerChanged)))
             {
                 nextPublish = Time.unscaledTime + .1f;
-                lastMask = mask;
+                lastMask = publishedMask;
                 lastBusy = busy;
                 lastPaused = paused;
+                lastDetailed = detailed;
+                lastStateOwner = stateOwnerId;
                 nextHeartbeat = Time.unscaledTime + 1;
-                exhibit.PublishCoreLocal(mask, busy, paused);
+                exhibit.PublishCoreLocal(publishedMask, busy, paused);
             }
 
+            // Hidden textures use a local, deliberately readable illustration of activity.
+            // Its phase is not inference progress and does not generate network updates.
+            bool displayBusy = local ? busy : exhibit.computing;
+            bool displayPaused = local ? paused : exhibit.computationPaused;
+            if (detailed || !displayBusy) hiddenAnimationClock = 0;
+            else if (!displayPaused) hiddenAnimationClock += Time.unscaledDeltaTime;
+            int displayMask = detailed ? (local ? mask : exhibit.layerMask) : 0;
+            if (!detailed && displayBusy)
+            {
+                int head = Mathf.FloorToInt(hiddenAnimationClock / .1f) % 24;
+                displayMask = (1 << head) | (1 << ((head + 23) % 24));
+            }
             if (coreMaterial != null)
-                coreMaterial.SetFloat("_LayerMask", local ? mask : exhibit.layerMask);
+                coreMaterial.SetFloat("_LayerMask", displayMask);
             showBlend = Mathf.MoveTowards(showBlend, exhibit.texturesShown ? 1 : 0, Time.unscaledDeltaTime * 2.5f);
             busyBlend = Mathf.MoveTowards(busyBlend, exhibit.computing ? 1 : 0, Time.unscaledDeltaTime * 3);
             if (!exhibit.computationPaused)

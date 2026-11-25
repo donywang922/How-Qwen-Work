@@ -38,7 +38,7 @@ namespace QwenWorld
         private float lastSync;
         private float syncInterval = .5f;
         private float nextProgressSync, nextProgressUi, localStatusUntil;
-        private bool progressWasRunning;
+        private bool progressWasRunning, progressWasVisible;
         private string readableTranscript = "";
         public void Start()
         {
@@ -280,6 +280,13 @@ namespace QwenWorld
         public string GetProgressText()
         {
             bool local = supportsInference && runner != null && IsLocalOwner();
+            if (!local && exhibit != null && !exhibit.texturesShown)
+            {
+                if (sharedState == 3) return LocalText(QwenLocalization.ERROR);
+                if (sharedState == 2) return LocalText(QwenLocalization.STOPPED_STATE);
+                if (sharedState == 1) return LocalText(exhibit.computationPaused ? QwenLocalization.PAUSED_STATE : QwenLocalization.RUNNING_STATE);
+                return LocalText(sharedResponse.Length > 0 ? QwenLocalization.COMPLETED_STATE : QwenLocalization.READY);
+            }
             int total = local ? runner.GetPromptTokenCount() : exhibit == null ? 0 : exhibit.progressPromptTotal;
             int done = local ? Mathf.Min(runner.position,total) : exhibit == null ? 0 : exhibit.progressPromptDone;
             int tokens = local ? runner.generatedCount : exhibit == null ? 0 : exhibit.progressOutputTokens;
@@ -304,13 +311,18 @@ namespace QwenWorld
 
         public void Update()
         {
-            if (supportsInference && runner != null && exhibit != null && IsLocalOwner()
-                && Time.unscaledTime >= nextProgressSync && (runner.running || progressWasRunning))
+            if (supportsInference && runner != null && exhibit != null && IsLocalOwner())
             {
-                nextProgressSync = Time.unscaledTime + .5f;
-                progressWasRunning = runner.running;
-                exhibit.PublishProgressLocal(Mathf.Min(runner.position,runner.GetPromptTokenCount()),runner.GetPromptTokenCount(),
-                    runner.generatedCount,runner.passCursor,runner.steps == null ? 849 : runner.steps.Length,runner.GetProgressLayer());
+                bool visible = exhibit.texturesShown;
+                if (visible && (!progressWasVisible || (Time.unscaledTime >= nextProgressSync && (runner.running || progressWasRunning))))
+                {
+                    nextProgressSync = Time.unscaledTime + .5f;
+                    progressWasRunning = runner.running;
+                    exhibit.PublishProgressLocal(Mathf.Min(runner.position,runner.GetPromptTokenCount()),runner.GetPromptTokenCount(),
+                        runner.generatedCount,runner.passCursor,runner.steps == null ? 849 : runner.steps.Length,runner.GetProgressLayer());
+                }
+                if (!visible) progressWasRunning = false;
+                progressWasVisible = visible;
             }
             if (Time.unscaledTime >= nextProgressUi && Time.unscaledTime >= localStatusUntil)
             {

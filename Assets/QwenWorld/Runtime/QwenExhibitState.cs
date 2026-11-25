@@ -71,6 +71,7 @@ namespace QwenWorld
             if (!OwnsState() || !Utilities.IsValid(Sender()))
                 return;
             texturesShown = value;
+            if (!value) ClearDetailedProgress();
             Changed();
         }
 
@@ -170,6 +171,7 @@ namespace QwenWorld
 
         public void PublishCoreLocal(int mask, bool busy, bool paused)
         {
+            if (!texturesShown) mask = 0;
             if (OwnsState())
                 _Core(mask, busy, paused);
             else
@@ -182,7 +184,7 @@ namespace QwenWorld
             var sender = Sender();
             if (!OwnsState() || controller == null || !Utilities.IsValid(sender) || sender != Networking.GetOwner(controller.gameObject))
                 return;
-            mask &= 16777215;
+            mask = texturesShown ? mask & 16777215 : 0;
             if (layerMask == mask && computing == busy && computationPaused == paused)
                 return;
             layerMask = mask;
@@ -193,6 +195,7 @@ namespace QwenWorld
 
         public void PublishProgressLocal(int done, int total, int tokens, int op, int opTotal, int layer)
         {
+            if (!texturesShown) return;
             if (OwnsState()) _Progress(done,total,tokens,op,opTotal,layer);
             else SendCustomNetworkEvent(NetworkEventTarget.Owner,nameof(_Progress),done,total,tokens,op,opTotal,layer);
         }
@@ -201,7 +204,7 @@ namespace QwenWorld
         public void _Progress(int done, int total, int tokens, int op, int opTotal, int layer)
         {
             var sender = Sender();
-            if (!OwnsState() || controller == null || !Utilities.IsValid(sender)
+            if (!texturesShown || !OwnsState() || controller == null || !Utilities.IsValid(sender)
                 || sender != Networking.GetOwner(controller.gameObject)) return;
             total = Mathf.Clamp(total,0,8192);
             done = Mathf.Clamp(done,0,total);
@@ -214,6 +217,13 @@ namespace QwenWorld
             progressPromptDone = done; progressPromptTotal = total; progressOutputTokens = tokens;
             progressOperator = op; progressOperatorTotal = opTotal; progressLayer = layer;
             Changed();
+        }
+
+        private void ClearDetailedProgress()
+        {
+            layerMask = 0;
+            progressPromptDone = 0; progressPromptTotal = 0; progressOutputTokens = 0;
+            progressOperator = 0; progressOperatorTotal = 849; progressLayer = 0;
         }
 
         public void Update()

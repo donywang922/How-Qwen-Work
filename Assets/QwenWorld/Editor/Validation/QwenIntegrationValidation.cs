@@ -8,6 +8,7 @@ using UdonSharpEditor;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using VRC.SDK3.ClientSim;
 using VRC.SDK3.Network;
 using VRC.SDK3.UdonNetworkCalling;
@@ -47,6 +48,19 @@ namespace QwenWorld.Editor
             QwenModelPipeline.Compile();
             // Finish the SDK's delayed proxy setup before replacing scenes.
             EditorApplication.delayCall += BeginValidation;
+        }
+
+        public static void ValidateKeyboardFocusBatch()
+        {
+            QwenModelPipeline.Compile();
+            var scene = EditorSceneManager.OpenScene(QwenProject.MainScene, OpenSceneMode.Single);
+            // No tokenization or model dispatch is needed for input focus checks.
+            foreach (var tokenizer in QwenProject.Components<ShaderGPT.Udon.GPTTokenizer>(scene))
+            {
+                tokenizer.enabled = false;
+                UdonSharpEditorUtility.GetBackingUdonBehaviour(tokenizer).enabled = false;
+            }
+            Next("focus-enter");
         }
 
         static void Require(bool ok, string reason)
@@ -203,6 +217,11 @@ namespace QwenWorld.Editor
             try
             {
                 double now = EditorApplication.timeSinceStartup;
+                if (phase.StartsWith("focus-", StringComparison.Ordinal))
+                {
+                    TickKeyboardFocus(phase, now);
+                    return;
+                }
                 if (phase == "enter" || phase == "viewer-enter")
                 {
                     if (Environment.StackTrace.Contains("VRC.Editor.EnvConfig") || EditorApplication.isCompiling || EditorApplication.isUpdating)
@@ -568,6 +587,79 @@ namespace QwenWorld.Editor
             catch (Exception e)
             {
                 Fail(e);
+            }
+        }
+
+        static void TickKeyboardFocus(string phase, double now)
+        {
+            if (since == 0) since = now;
+            if (phase == "focus-exit")
+            {
+                if (EditorApplication.isPlayingOrWillChangePlaymode) return;
+                SessionState.SetString(Key, "");
+                Debug.Log("QWEN_KEYBOARD_FOCUS_PASSED");
+                if (Application.isBatchMode) EditorApplication.Exit(0);
+                return;
+            }
+            if (phase == "focus-enter")
+            {
+                if (EditorApplication.isCompiling || EditorApplication.isUpdating) { since = now; return; }
+                if (now - since < 3) return;
+                Next("focus-ready"); EditorApplication.isPlaying = true; return;
+            }
+            Require(now - since < 30, "Keyboard focus fixture timed out");
+            if (!EditorApplication.isPlaying || !Utilities.IsValid(Networking.LocalPlayer)) return;
+            if (phase == "focus-ready")
+            {
+                controller = UnityEngine.Object.FindObjectOfType<QwenWorldController>();
+                socialProxy = UnityEngine.Object.FindObjectOfType<QwenSocialUI>();
+                if (controller == null || socialProxy == null) return;
+                social = UdonSharpEditorUtility.GetBackingUdonBehaviour(socialProxy);
+                if (social.GetProgramVariable("slotPlayerIds") == null) return;
+                state = UdonSharpEditorUtility.GetBackingUdonBehaviour(controller.exhibit);
+                engine = UdonSharpEditorUtility.GetBackingUdonBehaviour(controller.runner);
+                Require(!B(engine,"running"), "Focus validation must not run inference");
+                state.enabled = engine.enabled = social.enabled = false;
+                state.SetProgramVariable("keyboardHolder", Networking.LocalPlayer.playerId);
+                controller.promptInput.text = "保留草稿 / keep draft";
+                social.SendCustomEvent("KeyboardInteract");
+                Next("focus-open-check"); return;
+            }
+            if (now - since < .15) return; // InputField applies activation requests in its next LateUpdate.
+            if (phase == "focus-open-check")
+            {
+                Require(socialProxy.inputRoot.activeSelf && !controller.promptInput.isFocused, "Keyboard Interact captured typing focus");
+                controller.promptInput.ActivateInputField(); // Deliberately seed an old focused selection.
+                Next("focus-seeded"); return;
+            }
+            if (phase == "focus-seeded")
+            {
+                Require(controller.promptInput.isFocused, "Fixture did not establish old input focus");
+                social.SendCustomEvent("KeyboardInteract");
+                Next("focus-released"); return;
+            }
+            if (phase == "focus-released")
+            {
+                Require(!controller.promptInput.isFocused && EventSystem.current.currentSelectedGameObject != controller.promptInput.gameObject,
+                    "Keyboard Interact retained an old selected InputField");
+                social.SendCustomEvent("CloseInput"); social.SendCustomEvent("KeyboardInteract");
+                Next("focus-reopened"); return;
+            }
+            if (phase == "focus-reopened")
+            {
+                Require(!controller.promptInput.isFocused, "Reopening reactivated stale focus");
+                Require(controller.promptInput.text == "保留草稿 / keep draft", "Opening altered the draft");
+                var click = new PointerEventData(EventSystem.current) { button = PointerEventData.InputButton.Left };
+                ExecuteEvents.Execute(controller.promptInput.gameObject, click, ExecuteEvents.pointerClickHandler);
+                Next("focus-clicked"); return;
+            }
+            if (phase == "focus-clicked")
+            {
+                Require(controller.promptInput.isFocused && controller.promptInput.interactable, "Direct text-field click no longer activates input");
+                string output = QwenProject.DataPath("validation/keyboard-focus"); Directory.CreateDirectory(output);
+                File.WriteAllText(output + "/report.json", "{\"passed\":true,\"keyboardDoesNotFocus\":true,\"oldFocusReleased\":true,\"reopenDoesNotFocus\":true,\"draftPreserved\":true,\"directTextClickWorks\":true,\"scope\":\"Production Udon in ClientSim; Unity InputField focus across frames. No inference, world build or native VRChat keyboard popup verification.\"}\n");
+                social.SendCustomEvent("CloseInput");
+                Next("focus-exit"); EditorApplication.isPlaying = false;
             }
         }
 

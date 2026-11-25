@@ -98,10 +98,18 @@ namespace QwenWorld
         {
             if (exhibit == null || !exhibit.IsLocalHolder() || inputRoot == null)
                 return;
+            // Only a real click on the InputField should enter VRChat's text-input flow.
+            // Selecting it from Interact captures desktop movement keys without that popup.
+            if (controller != null && controller.promptInput != null)
+            {
+                controller.promptInput.DeactivateInputField();
+                // Selectable clears its EventSystem selection when made non-interactable.
+                // PermissionChanged below restores input for the authorized player.
+                controller.promptInput.interactable = false;
+            }
             inputCollapsed = false;
             inputRoot.SetActive(true);
             PermissionChanged();
-            if (controller.promptInput != null && controller.promptInput.interactable) controller.promptInput.ActivateInputField();
         }
 
         public void CloseInput()

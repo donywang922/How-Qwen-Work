@@ -51,7 +51,11 @@ namespace QwenWorld
         public const int HELP_TITLE = 42;
         public const int HELP_BODY = 43;
         public const int STOP = 44;
-        public const int KeyCount = 45;
+        public const int RUNNING_STATE = 45;
+        public const int PAUSED_STATE = 46;
+        public const int STOPPED_STATE = 47;
+        public const int COMPLETED_STATE = 48;
+        public const int KeyCount = 49;
         public QwenWorldController controller;
         public QwenSocialUI social;
         public QwenLocalMenu menu;
@@ -110,6 +114,10 @@ namespace QwenWorld
             "操作与展示说明", "Controls and display", "操作と表示について", "조작 및 표시 안내", // HELP_TITLE
             "Tab / 双击板机：打开菜单。\n握拳与放松的双手靠近千问：显示贴图。\n键盘：靠近获得权限，走远后自动交接。\n平台：站上白地后拖动滑条，掉落会复位。\nCRT 和读写线仅在执行端显示。四边描边代表读，四角代表写。\n核心有24层；暂停时显示下一个算子。\n\nAI立绘：ZipZipPipe · Pixiv 148186519\n已抠图、修改表情 · 署名使用，不可商用。", "Tab / double trigger: open menu.\nFist + relaxed hand near Qwen: show textures.\nKeyboard: approach to claim; walk away to pass it on.\nDeck: step onto white floor, then raise slider. Falling resets it.\nCRT data and lines are local. Edges = read; corners = write.\nCore: 24 layers. Pause previews the next operator.\n\nAI art: ZipZipPipe · Pixiv 148186519\nCutout / expression edits. Credit; noncommercial.", "Tab / トリガー2回：メニュー。\nQwenの近くで片手を握り、もう片手を開いて近づけるとテクスチャを表示。\n入力権限は近づくと取得し、離れると自動で交代。\n白い床に乗り、スライダーで足場を上げます。落ちるとリセット。\nCRTと線は実行側のみ。辺の枠は読み込み、角の枠は書き込み。\nコアは24層。一時停止中は次の演算を表示。\n\nAI立ち絵：ZipZipPipe · Pixiv 148186519\n背景除去・表情変更。要クレジット・非商用。", "Tab / 트리거 두 번: 메뉴 열기.\nQwen 근처에서 한 손은 주먹, 다른 손은 펴서 모으면 텍스처 표시.\n키보드: 가까이 가면 권한 획득, 멀어지면 자동 인계.\n흰 바닥 위에서 슬라이더로 발판 높이 조절. 떨어지면 초기화.\nCRT와 선은 실행 측에만 표시. 변 테두리는 읽기, 모서리는 쓰기.\n코어는 24개 레이어. 일시 정지하면 다음 연산 표시.\n\nAI 일러스트: ZipZipPipe · Pixiv 148186519\n배경 제거·표정 수정. 출처 표시·비상업용.", // HELP_BODY
             "停止", "Stop", "停止", "중지", // STOP
+            "运行中", "Running", "実行中", "실행 중", // RUNNING_STATE
+            "已暂停", "Paused", "一時停止中", "일시 정지됨", // PAUSED_STATE
+            "已停止", "Stopped", "停止済み", "중지됨", // STOPPED_STATE
+            "已完成", "Complete", "完了", "완료", // COMPLETED_STATE
         };
         public void Start() { Apply(); }
         public string T(int key) { return messages[key * 4 + Mathf.Clamp(language,0,3)]; }
