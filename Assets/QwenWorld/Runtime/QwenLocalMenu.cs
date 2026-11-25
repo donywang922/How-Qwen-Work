@@ -20,8 +20,8 @@ namespace QwenWorld
         public GameObject executionControls;
         public Renderer girlRenderer;
         public Transform girlOrigin;
-        public Text visibilityLabel, runLabel, mountLabel, stateLabel;
-        public Button runButton, stepButton, mountButton;
+        public Text visibilityLabel, runLabel, stateLabel;
+        public Button runButton, stepButton;
         public ParticleSystem girlWishParticles, playerWishParticles;
         public float doubleClickSeconds = .32f;
         public float wishHoldSeconds = .45f;
@@ -29,8 +29,6 @@ namespace QwenWorld
         public float wishRange = 4.5f;
         [HideInInspector]
         public bool texturesVisible;
-        [HideInInspector]
-        public bool mountOnArm = true;
         private Material expressionMaterial;
         private bool initialized;
         private bool leftUse, rightUse, leftGrab, rightGrab;
@@ -39,6 +37,8 @@ namespace QwenWorld
         private float wishStarted = -1, lastWish = -100, releaseStarted = -1;
         private bool wishLatched;
         private float nextGestureCheck, nextStateRefresh;
+        private Vector3 frontMenuOffset;
+        private bool hasFrontAnchor;
         public void Start()
         {
             if (initialized)
@@ -143,16 +143,6 @@ namespace QwenWorld
             ResetTriggerClicks();
         }
 
-        public void ToggleMount()
-        {
-            var player = Networking.LocalPlayer;
-            if (!Utilities.IsValid(player) || !player.IsUserInVR())
-                return;
-            mountOnArm = !mountOnArm;
-            PlaceInFront();
-            RefreshMenu();
-        }
-
         public void ToggleTextures()
         {
             if (exhibit != null)
@@ -224,12 +214,6 @@ namespace QwenWorld
                 runButton.interactable = texturesVisible && canControl;
             if (stepButton != null)
                 stepButton.interactable = texturesVisible && canControl && runner != null && runner.running;
-            var player = Networking.LocalPlayer;
-            bool vr = Utilities.IsValid(player) && player.IsUserInVR();
-            if (mountButton != null)
-                mountButton.interactable = vr;
-            if (mountLabel != null)
-                mountLabel.text = controller.LocalText(vr && mountOnArm ? QwenLocalization.ARM : QwenLocalization.FRONT);
             if (stateLabel != null)
             {
                 stateLabel.text = controller != null ? controller.GetProgressText() : "等待模型状态";
@@ -243,6 +227,13 @@ namespace QwenWorld
                 return;
             var head = player.GetTrackingData(VRCPlayerApi.TrackingDataType.Head);
             menuRoot.transform.SetPositionAndRotation(head.position + head.rotation * new Vector3(0, -.12f, .8f), head.rotation);
+            frontMenuOffset=menuRoot.transform.position-player.GetPosition();
+            hasFrontAnchor=true;
+        }
+
+        private void FollowFrontMenu(Vector3 playerPosition)
+        {
+            if(hasFrontAnchor&&menuRoot!=null) menuRoot.transform.position=playerPosition+frontMenuOffset;
         }
 
         public override void PostLateUpdate()
@@ -251,20 +242,15 @@ namespace QwenWorld
             if (!Utilities.IsValid(player))
                 return;
             var head = player.GetTrackingData(VRCPlayerApi.TrackingDataType.Head);
-            if (menuRoot != null && menuRoot.activeSelf && mountOnArm && player.IsUserInVR())
+            bool vr=player.IsUserInVR();
+            if (menuRoot != null && menuRoot.activeSelf)
             {
-                Vector3 elbow = player.GetBonePosition(HumanBodyBones.LeftLowerArm);
-                Vector3 hand = player.GetBonePosition(HumanBodyBones.LeftHand);
-                if (elbow != Vector3.zero && hand != Vector3.zero)
-                {
-                    Vector3 anchor = Vector3.Lerp(elbow, hand, .65f);
-                    Vector3 toHead = head.position - anchor;
-                    Vector3 position = anchor + toHead.normalized * .08f;
-                    menuRoot.transform.SetPositionAndRotation(position, Quaternion.LookRotation(position - head.position, head.rotation * Vector3.up));
-                }
+                // Translate the front menu with the player, but keep its opening rotation
+                // fixed so dragging the slider does not move the target under the pointer.
+                FollowFrontMenu(player.GetPosition());
             }
 
-            if (!player.IsUserInVR() || Time.unscaledTime < nextGestureCheck)
+            if (!vr || Time.unscaledTime < nextGestureCheck)
                 return;
             nextGestureCheck = Time.unscaledTime + .08f;
             bool pose = IsWishPose(player, head.position, head.rotation);

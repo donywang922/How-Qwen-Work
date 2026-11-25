@@ -19,6 +19,9 @@ TEXT_SUFFIXES = {'.cs','.py','.ps1','.md','.txt','.json','.yaml','.yml','.unity'
 def audit(root=PROJECT_ROOT):
     files = list(source_files(root))
     issues = []
+    artwork = root / 'Docs/QwenGirl-Asset-Source.json'
+    if artwork.exists() and json.loads(artwork.read_text(encoding='utf-8-sig')).get('licenseStatus') == 'unverified':
+        issues.append({'file':'Docs/QwenGirl-Asset-Source.json','issue':'standee author/redistribution permission is unverified; do not publish the complete source package yet'})
     for path in files:
         name = path.relative_to(root).as_posix()
         if path.is_symlink():

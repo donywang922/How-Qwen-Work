@@ -4,7 +4,8 @@
     "open": "Assets/QwenWorld/Environment/QwenGirl/QwenGirl-Open.png",
     "closed": "Assets/QwenWorld/Environment/QwenGirl/QwenGirl-Closed.png",
     "prefab": "Assets/QwenWorld/Environment/QwenGirl/QwenGirl.prefab",
-    "shader": "Assets/QwenWorld/Shaders/Environment/QwenGirlStandee.shader"
+    "shader": "Assets/QwenWorld/Shaders/Environment/QwenGirlStandee.shader",
+    "referenceAtlas": "Assets/QwenWorld/Environment/SpawnLounge/ReferenceAtlas.png"
   },
   "prompts": {
     "open": "Use case: background-extraction. Edit target: the supplied full-body Qwen anime girl illustration. Extract the EXACT existing character onto a genuinely transparent alpha background for a Unity life-size flat standee. Only remove the exterior white background and enclosed background gaps between hair locks, fan and hand, body and accessories. Preserve all white clothing, skin, white hair ornaments, fan art, jewelry, tassels, shoes and soft antialiased drawn contours. Preserve her eyes OPEN, original small smile, identity, pose, every costume pattern, original blue violet ivory colors, original linework and entire head-to-toe framing. Do not redesign, repaint, add highlights, add a pedestal, invent backing plastic, add a sticker outline, add a shadow, crop or add text. Keep same portrait composition, body proportions and canvas aspect. Real transparency, not a white or checkerboard backdrop.",
@@ -18,8 +19,27 @@
     "billboard": false,
     "expressionProperty": "_EyesClosed",
     "platformSettings": "PC: 1024x2048 DXT5 with mips, verified in Unity. Android: max 1024 ASTC 6x6 configured; device rendering not tested.",
-    "runtimeModeBinding": "QwenComputeDisplay binds _EyesClosed to globally synchronized texture visibility."
+    "runtimeModeBinding": "QwenComputeDisplay binds _EyesClosed to globally synchronized texture visibility.",
+    "referencePage": "Head-to-thigh crop; UV aspect calculated from the source PNG dimensions, with attribution and noncommercial source terms embedded in the reference atlas."
   },
-  "origin": "Project-owner-provided generated character illustration, extracted and locally edited for this world.",
-  "license": "Apache-2.0, authorized by the project owner for this standee artwork."
+  "origin": "AI-generated Qwen character illustration by ZipZipPipe, from the AI娘化 collection (Pixiv artwork 148186519).",
+  "license": "Custom source terms: credit the creator; noncommercial use only. Not Apache-2.0. See Docs/QwenGirl-Usage-Terms.md.",
+  "source": {
+    "url": "https://www.pixiv.net/artworks/148186519",
+    "artworkId": "148186519",
+    "author": "ZipZipPipe",
+    "license": "Custom attribution and noncommercial terms",
+    "verification": "Creator name, profile URL, AI-generated label and work description supplied by the project owner as a transcription of the Pixiv page on 2026-11-24. The browser could not independently read the page.",
+    "generation": {
+      "method": "AI-generated",
+      "evidence": "AI生成 label in the supplied page transcription."
+    },
+    "title": "AI娘化",
+    "authorUrl": "https://www.pixiv.net/users/18604994",
+    "termsQuote": "作为保存用，方便所有人取用，需要标注作者，不可商用。"
+  },
+  "licenseStatus": "documented-custom-noncommercial",
+  "processing": "AI-assisted background extraction and a local closed-eye expression edit. These are processing steps applied to the source illustration, not evidence of original illustration authorship.",
+  "licenseScopeNote": "The separate CC BY-NC-SA 4.0 statement explicitly concerns the DeepSeek design based on 上善; it is not assigned to the Qwen illustration.",
+  "attribution": "Qwen character illustration: ZipZipPipe — AI娘化, Pixiv 148186519. AI-generated. Project edits: background extraction and closed-eye expression. Credit required; noncommercial use only."
 }

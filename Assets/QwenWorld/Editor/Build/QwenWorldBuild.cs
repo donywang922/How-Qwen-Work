@@ -43,6 +43,14 @@ namespace QwenWorld.Editor
             SessionState.SetBool(PendingKey + ".Direct", true);
         }
 
+        [MenuItem("Qwen World/Validation/Build iOS viewer from main (no upload)")]
+        public static void ValidateIOSFromMainBatch()
+        {
+            if (!Application.isBatchMode && !EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
+            Queue("iOS", false, false);
+            SessionState.SetBool(PendingKey + ".Direct", true);
+        }
+
         public static void BuildNativeTest()
         {
             Queue("PC", true, false);
@@ -89,12 +97,12 @@ namespace QwenWorld.Editor
             {
                 string failure = QwenModelPipeline.Results + "/bundle-failure.txt";
                 if (File.Exists(failure)) File.Delete(failure);
-                bool android = target == "Android";
-                var expectedTarget = android ? BuildTarget.Android : BuildTarget.StandaloneWindows64;
+                var expectedTarget = target == "iOS" ? BuildTarget.iOS : target == "Android" ? BuildTarget.Android : BuildTarget.StandaloneWindows64;
+                bool viewer = QwenPlatformBuild.IsViewerTarget(expectedTarget);
                 if (EditorUserBuildSettings.activeBuildTarget != expectedTarget)
-                    throw new InvalidOperationException("Start Unity with -buildTarget " + (android ? "Android" : "Win64"));
+                    throw new InvalidOperationException("Start Unity with -buildTarget " + (viewer ? target : "Win64"));
                 QwenModelPipeline.Compile();
-                string scenePath = android && !direct ? QwenPlatformBuild.CreateViewerScene() : nativeTest ? QwenNativeTestScene.Create() : QwenProject.MainScene;
+                string scenePath = viewer && !direct ? QwenPlatformBuild.CreateViewerScene() : nativeTest ? QwenNativeTestScene.Create() : QwenProject.MainScene;
                 var scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
                 if (scene.path != scenePath)
                     scene = EditorSceneManager.OpenScene(scenePath, OpenSceneMode.Single);
@@ -111,11 +119,11 @@ namespace QwenWorld.Editor
                 EditorSceneManager.MarkSceneDirty(scene);
                 EditorSceneManager.SaveScene(scene);
                 AssetDatabase.SaveAssets();
-                if (android && !direct)
+                if (viewer && !direct)
                     QwenPlatformBuild.ValidateViewerDependencies(scenePath);
                 Directory.CreateDirectory(QwenModelPipeline.Results);
                 if (!nativeTest && !direct)
-                    File.WriteAllText(QwenModelPipeline.Results + "/network-" + (android ? "android" : "pc") + ".json", "[" + string.Join(",", descriptor.NetworkIDCollection.Select(x => "{\"id\":" + x.ID + ",\"object\":\"" + x.gameObject.name + "\"}")) + "]");
+                    File.WriteAllText(QwenModelPipeline.Results + "/network-" + (viewer ? target.ToLowerInvariant() : "pc") + ".json", "[" + string.Join(",", descriptor.NetworkIDCollection.Select(x => "{\"id\":" + x.ID + ",\"object\":\"" + x.gameObject.name + "\"}")) + "]");
                 var panel = EditorWindow.GetWindow<VRCSdkControlPanel>();
                 var builder = new HeadlessWorldBuilder(panel);
                 // Public SDK validation/build pipeline. This code never invokes an upload API.
@@ -126,7 +134,7 @@ namespace QwenWorld.Editor
                 Directory.CreateDirectory(Path.GetDirectoryName(destination));
                 File.Copy(builtPath, destination, true);
                 long bytes = new FileInfo(destination).Length;
-                if (bytes >= (android ? 100_000_000L : 1_000_000_000L))
+                if (bytes >= (viewer ? 100_000_000L : 1_000_000_000L))
                     throw new InvalidOperationException("World bundle exceeds its platform budget.");
                 if (!nativeTest && !direct)
                     File.WriteAllText(QwenModelPipeline.Results + "/bundle-" + target + ".json", JsonUtility.ToJson(new BundleReport{platform = target, path = destination, bytes = bytes}, true));
@@ -135,9 +143,9 @@ namespace QwenWorld.Editor
                 {
                     var source = EditorSceneManager.OpenScene(QwenProject.MainScene, OpenSceneMode.Single);
                     if (!QwenProject.Components<QwenWorldController>(source).Single().supportsInference)
-                        throw new InvalidOperationException("Android build altered the authored PC scene.");
-                    File.WriteAllText(QwenProject.DataPath("validation/refactor/direct-android.json"), JsonUtility.ToJson(new BundleReport{platform = "Android-from-main", path = destination, bytes = bytes}, true));
-                    Debug.Log("QWEN_DIRECT_ANDROID_BUILD_PASSED");
+                        throw new InvalidOperationException("Mobile build altered the authored PC scene.");
+                    File.WriteAllText(QwenProject.DataPath("validation/refactor/direct-" + target.ToLowerInvariant() + ".json"), JsonUtility.ToJson(new BundleReport{platform = target + "-from-main", path = destination, bytes = bytes}, true));
+                    Debug.Log("QWEN_DIRECT_" + target.ToUpperInvariant() + "_BUILD_PASSED");
                 }
 
                 if (launch)

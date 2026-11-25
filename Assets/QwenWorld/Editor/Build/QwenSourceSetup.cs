@@ -96,7 +96,7 @@ namespace QwenWorld.Editor
             var config = File.Exists(configPath) ? JsonUtility.FromJson<LocalConfig>(File.ReadAllText(configPath)) : new LocalConfig();
             if (string.IsNullOrEmpty(config.worldBlueprintId))
                 throw new InvalidOperationException("Set worldBlueprintId in ignored .qwen-local.json to update an existing world. The source scene is intentionally unbound.");
-            string source = EditorUserBuildSettings.activeBuildTarget == BuildTarget.Android ? QwenPlatformBuild.CreateViewerScene() : QwenProject.MainScene;
+            string source = QwenPlatformBuild.IsViewerTarget(EditorUserBuildSettings.activeBuildTarget) ? QwenPlatformBuild.CreateViewerScene() : QwenProject.MainScene;
             const string target = QwenProject.Root + "/Generated/Build/QwenLaboratory-LocalPublish.unity";
             EditorSceneManager.OpenScene(QwenProject.MainScene,OpenSceneMode.Single);
             QwenProject.EnsureAssetFolder(QwenProject.Root + "/Generated/Build");

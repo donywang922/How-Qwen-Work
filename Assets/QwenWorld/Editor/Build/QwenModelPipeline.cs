@@ -82,7 +82,7 @@ namespace QwenWorld.Editor
             if (UdonSharpProgramAsset.AnyUdonSharpScriptHasError())
                 throw new InvalidOperationException("UdonSharp compilation reported errors; refusing stale programs.");
             AssetDatabase.SaveAssets();
-            foreach (string name in new[]{"QwenTextureRunner", "QwenWorldController", "QwenLocalMenu", "QwenExhibitState", "QwenSocialUI", "QwenKeyboard", "QwenComputeDisplay", "QwenObservationPlatform", "QwenLocalization"})
+            foreach (string name in new[]{"QwenTextureRunner", "QwenWorldController", "QwenLocalMenu", "QwenExhibitState", "QwenSocialUI", "QwenKeyboard", "QwenComputeDisplay", "QwenObservationPlatform", "QwenLocalization", "QwenLightbox", "QwenBenchSeat"})
             {
                 var program = AssetDatabase.LoadAssetAtPath<UdonSharpProgramAsset>(Root + "/Runtime/" + name + ".asset");
                 if (program.GetRealProgram() == null)
@@ -94,13 +94,14 @@ namespace QwenWorld.Editor
 
         public static void EnsurePrograms()
         {
-            foreach (string name in new[]{"QwenTextureRunner", "QwenWorldController", "QwenLocalMenu", "QwenExhibitState", "QwenSocialUI", "QwenKeyboard", "QwenComputeDisplay", "QwenObservationPlatform", "QwenLocalization"})
+            foreach (string name in new[]{"QwenTextureRunner", "QwenWorldController", "QwenLocalMenu", "QwenExhibitState", "QwenSocialUI", "QwenKeyboard", "QwenComputeDisplay", "QwenObservationPlatform", "QwenLocalization", "QwenLightbox", "QwenBenchSeat"})
             {
                 string path = Root + "/Runtime/" + name + ".asset";
                 if (AssetDatabase.LoadAssetAtPath<UdonSharpProgramAsset>(path) != null)
                     continue;
                 var asset = ScriptableObject.CreateInstance<UdonSharpProgramAsset>();
                 asset.sourceCsScript = AssetDatabase.LoadAssetAtPath<MonoScript>(Root + "/Runtime/" + name + ".cs");
+                asset.ScriptVersion = UdonSharpProgramVersion.CurrentVersion;
                 AssetDatabase.CreateAsset(asset, path);
             }
 

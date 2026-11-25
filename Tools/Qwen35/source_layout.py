@@ -20,7 +20,7 @@ def is_source_path(relative):
         return False
     if any(p in {'__pycache__','.git','.idea','.vs'} for p in parts):
         return False
-    if name.startswith(EXCLUDED_PREFIXES) or name.endswith(('.pyc','.part','.tmp','.vrcw')):
+    if name.startswith(EXCLUDED_PREFIXES) or name.endswith(('.pyc','.part','.tmp','.vrcw','.blend1','.blend2')):
         return False
     if name.startswith('Assets/QwenWorld/Generated/Bake.unity'):
         return False

@@ -1,6 +1,6 @@
 # 轨道天空与机械外环
 
-主场景使用用户建模工程交付的 `Orbital_Ring_20K_Distant`，Android 从同一主场景生成。源 Blender 工程未修改；项目保留 FBX、五张源贴图与交付报告供离线重建。
+主场景使用用户建模工程交付的 `Orbital_Ring_20K_Distant`，Android 从同一主场景生成。原始建模工程未修改；高模与远景版副本已放入 `Tools/Blender/OrbitalRing`，均内嵌五张贴图，无外部 blend 库。工程同时保留 FBX、贴图、交付报告及可移植建模／导出脚本。
 
 ## 模型与摆放
 
@@ -53,3 +53,5 @@
 天空生成入口是 `Tools/Qwen35/make_orbital_sky.py`，源素材与 SHA256 清单位于外部 `QWEN_DATA_ROOT/art/sky/nasa`，只有最终合成全景导入 Unity。NASA、Gaia 与原作者署名保存在 `Assets/QwenWorld/Environment/SkySources.txt`。这些素材用于艺术合成，不代表 NASA 背书。
 
 当前世界包、平台剔除与渲染验证以 `Qwen35-Validation-Summary.json` 为准。早期外环试模和天空实验只保存在外部归档及历史验证目录，不再保留对应的临时编辑器验证类。
+
+Blender 原始工程与脚本说明见 `Tools/Blender/OrbitalRing/README.md`。它们放在 Assets 外，普通 Unity 打开和打包不依赖 Blender。

@@ -111,3 +111,7 @@ __pycache__/
 /Assets/QwenWorld/Models/**/*.exr.meta
 /Assets/QwenWorld/Models/**/tokenizer.json
 /Assets/QwenWorld/Models/**/tokenizer.json.meta
+
+# Blender editor backup files; authored .blend sources are included.
+*.blend1
+*.blend2

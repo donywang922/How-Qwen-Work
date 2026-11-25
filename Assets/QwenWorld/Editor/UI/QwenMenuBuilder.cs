@@ -50,7 +50,6 @@ namespace QwenWorld.Editor
             if (menu == null)
                 menu = root.AddUdonSharpComponent<QwenLocalMenu>();
             menu.texturesVisible = false;
-            menu.mountOnArm = true;
             menu.controller = controller;
             menu.runner = controller.runner;
             var transforms = scene.GetRootGameObjects().SelectMany(o => o.GetComponentsInChildren<Transform>(true)).ToArray();
@@ -72,14 +71,16 @@ namespace QwenWorld.Editor
             canvas.renderMode = RenderMode.WorldSpace;
             var rect = canvasObject.GetComponent<RectTransform>();
             rect.SetParent(root.transform, false);
-            rect.sizeDelta = new Vector2(480, 485);
+            rect.sizeDelta = new Vector2(480, 415);
             rect.localScale = Vector3.one * .001f;
-            canvasObject.GetComponent<BoxCollider>().size = new Vector3(480, 485, 1);
+            canvasObject.GetComponent<BoxCollider>().size = new Vector3(480, 415, 1);
+            // UI pointer hit testing needs a collider, but the menu must not push the player.
+            canvasObject.GetComponent<BoxCollider>().isTrigger = true;
             Type uiShape = AppDomain.CurrentDomain.GetAssemblies().Select(a => a.GetType("VRC.SDK3.Components.VRCUiShape") ?? a.GetType("VRC.SDKBase.VRC_UiShape")).FirstOrDefault(t => t != null);
             if (uiShape == null)
                 throw new InvalidOperationException("VRChat UI shape unavailable.");
             canvasObject.AddComponent(uiShape);
-            var background = Rect("White panel", rect, 0, 0, 480, 485).gameObject.AddComponent<Image>();
+            var background = Rect("White panel", rect, 0, 0, 480, 415).gameObject.AddComponent<Image>();
             background.color = new Color(1, 1, 1, .97f);
             background.raycastTarget = false;
             Label("Title", rect, "展示菜单", 24, 18, 350, 38, 25);
@@ -96,8 +97,6 @@ namespace QwenWorld.Editor
             menu.heightSlider = HeightSlider(rect, menu);
             Label("Lowest", rect, "最低隐藏", 24, 372, 180, 26, 17);
             Label("Highest", rect, "5.5 米", 370, 372, 86, 26, 17).alignment = TextAnchor.MiddleRight;
-            menu.mountButton = MakeButton("Mount", rect, "位置：左手臂", 24, 415, 432, 50, menu, "ToggleMount");
-            menu.mountLabel = menu.mountButton.GetComponentInChildren<Text>();
             menu.menuRoot = canvasObject;
             menu.girlWishParticles = MakeParticles("Girl wishing burst", root.transform, .4f);
             menu.playerWishParticles = MakeParticles("Player wishing burst", root.transform, .35f);

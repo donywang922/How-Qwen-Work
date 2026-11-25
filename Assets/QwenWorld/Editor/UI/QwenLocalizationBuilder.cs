@@ -35,10 +35,12 @@ namespace QwenWorld.Editor
             template = menu.runLabel; imageTemplate = menu.runButton.GetComponent<Image>();
             labels = new List<Text>(); keys = new List<int>();
             var root = menu.menuRoot.GetComponent<RectTransform>();
-            root.sizeDelta = new Vector2(480,545);
+            var oldMount = root.Find("Mount");
+            if (oldMount != null) UnityEngine.Object.DestroyImmediate(oldMount.gameObject);
+            root.sizeDelta = new Vector2(480,505);
             root.Find("White panel").GetComponent<RectTransform>().sizeDelta = root.sizeDelta;
-            root.Find("White panel").GetComponent<Image>().material = Glass(480,545,.88f);
-            menu.menuRoot.GetComponent<BoxCollider>().size = new Vector3(480,545,1);
+            root.Find("White panel").GetComponent<Image>().material = Glass(480,505,.88f);
+            menu.menuRoot.GetComponent<BoxCollider>().size = new Vector3(480,505,1);
             var title = root.Find("Title").GetComponent<Text>();
             title.rectTransform.sizeDelta = new Vector2(300,38); title.fontSize = 24;
             Bind(title,QwenLocalization.MENU);
@@ -54,22 +56,22 @@ namespace QwenWorld.Editor
             Move(root.Find("Textures"),126); Move(root.Find("Execution controls"),194);
             Move(menu.stateLabel.transform,254); Move(menu.heightLabel.transform,338);
             Move(menu.heightSlider.transform,386); Move(root.Find("Lowest"),428);
-            Move(root.Find("Highest"),428); Move(menu.mountButton.transform,471);
+            Move(root.Find("Highest"),428);
             Bind(menu.stepButton.GetComponentInChildren<Text>(),QwenLocalization.STEP);
             Bind(root.Find("Lowest").GetComponent<Text>(),QwenLocalization.LOWEST);
             Bind(root.Find("Highest").GetComponent<Text>(),QwenLocalization.HEIGHT_MAX);
             var help = MakeButton(root,"Help",352,14,44,44,locale,"ToggleHelp");
             help.GetComponentInChildren<Text>().text = "?";
-            var helpRect = Rect(root,"Language help",24,120,432,405);
+            var helpRect = Rect(root,"Language help",24,120,432,371);
             var helpImage = helpRect.GetComponent<Image>() ?? helpRect.gameObject.AddComponent<Image>();
-            helpImage.sprite = imageTemplate.sprite; helpImage.material = Glass(432,405,.995f);
+            helpImage.sprite = imageTemplate.sprite; helpImage.material = Glass(432,371,.995f);
             helpImage.color = Color.white; helpImage.raycastTarget = true;
             Bind(Label(helpRect,"Help title",18,14,396,38,23),QwenLocalization.HELP_TITLE);
-            Bind(Label(helpRect,"Help body",18,62,396,325,17),QwenLocalization.HELP_BODY);
+            Bind(Label(helpRect,"Help body",18,62,396,291,15),QwenLocalization.HELP_BODY);
             locale.helpRoot = helpRect.gameObject;
             locale.helpHiddenControls = new[]{root.Find("Textures").gameObject,menu.executionControls,menu.stateLabel.gameObject,
                 menu.heightLabel.gameObject,menu.heightSlider.gameObject,root.Find("Lowest").gameObject,
-                root.Find("Highest").gameObject,menu.mountButton.gameObject};
+                root.Find("Highest").gameObject};
             helpRect.SetAsLastSibling(); locale.helpRoot.SetActive(false);
 
             var input = social.inputRoot.transform;
@@ -87,6 +89,7 @@ namespace QwenWorld.Editor
             locale.stopButton = MakeButton(input,"Stop generation",229,380,182,48,controller,"StopGeneration");
             Bind(locale.stopButton.GetComponentInChildren<Text>(),QwenLocalization.STOP);
             locale.labels = labels.ToArray(); locale.keys = keys.ToArray();
+            QwenConsoleVisuals.ConfigureInputLayout(social);
             locale.Apply();
             return locale;
         }

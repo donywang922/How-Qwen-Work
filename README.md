@@ -6,7 +6,9 @@ A VRChat world that runs the **Qwen3.5-0.8B text model on local GPU textures**
 and visualizes its weights, reusable state buffers, and operator reads/writes.
 The PC world performs inference. Android clients view shared chat and core status.
 
-Original project code and owner-provided artwork: **Apache-2.0**.
+Original project code and owner-provided orbital-ring artwork: **Apache-2.0**.
+The AI-generated standee by [ZipZipPipe](https://www.pixiv.net/users/18604994) is included under separate **attribution-required, noncommercial** source terms, not Apache-2.0; see [artwork terms](Docs/QwenGirl-Usage-Terms.md).
+The complete package contains assets with different terms; commercial reuse requires replacing the noncommercial artwork or obtaining separate permission.
 Third-party components retain their own licenses; see [NOTICE](NOTICE) and
 [third-party notices](THIRD_PARTY_NOTICES.md).
 
@@ -29,6 +31,7 @@ compiled Udon caches, test reports, generated platform scenes and world bundles.
 Requirements: Unity **2022.3.22f1**, VRChat Creator Companion, and Python **3.12**.
 Install/restore **VRChat Worlds SDK 3.10.6** using Creator Companion; the version is
 recorded in `Packages/vpm-manifest.json`. Unity Package Manager restores Unity packages.
+The arrival pen rack also requires [QvPen / ureishi](https://github.com/ureishi/QvPen) **3.3.15**, restored through VCC.
 Do not copy another person's `Library`, SDK login settings, or Python virtual environment.
 
 Before opening the main scene in Unity, run from the project directory:
@@ -144,3 +147,5 @@ published-world bindings; it is not a guarantee that arbitrary future additions 
 See [implementation](Docs/Qwen35-Implementation.md),
 [scene/interaction specification](Docs/Qwen35-Central-Exhibit-Design.zh-CN.md) and
 [sky provenance](Docs/Qwen35-Orbital-Sky.md) for technical details.
+
+Blender authoring files (full-detail and distant) and portable rebuild/export scripts are included in [Tools/Blender/OrbitalRing](Tools/Blender/OrbitalRing/README.md), outside Assets. Both blends have packed textures; Unity does not require Blender to import the shipped FBX.

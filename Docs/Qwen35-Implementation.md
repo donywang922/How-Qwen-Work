@@ -10,8 +10,8 @@ PC 使用 Qwen3.5 0.8B 的完整 24 层文本网络。权重按 ShaderGPT 的 Q4
 | Runtime/QwenWorldController | 输入、共享对话、生成生命周期与执行端权限 |
 | Runtime/QwenExhibitState | 展示状态、核心高亮和许愿事件同步 |
 | Runtime/QwenComputeDisplay | 本地算子读写、核心和六条动作的材质数据 |
-| Runtime/QwenSocialUI、QwenKeyboard | 80 个只读面板分配、自动键盘跟随和锚定输入屏 |
-| Runtime/QwenLocalMenu | Tab、双击板机、手臂菜单和许愿手势 |
+| Runtime/QwenSocialUI、QwenKeyboard | 80 个只读面板分配与渐显展开、带角速度的平滑键盘跟随和小尺寸锚定输入屏 |
+| Runtime/QwenLocalMenu | Tab、双击板机、面前菜单和许愿手势 |
 | Runtime/QwenLocalization | 本地四语文本表、界面切换与帮助 |
 | Runtime/QwenObservationPlatform | 本地升降平台、乘坐跟随、掉落复位和安全回收 |
 | Editor/Build | 统一路径、模型处理、平台剔除和 SDK 本地打包 |
@@ -30,11 +30,13 @@ PC 使用 Qwen3.5 0.8B 的完整 24 层文本网络。权重按 ShaderGPT 的 Q4
 
 ## 单主场景与平台
 
-`Assets/QwenWorld/Scenes/QwenLaboratory.unity` 是唯一编辑源，沿用原 PC 场景 GUID。EditorBuildSettings 只保留它。`QwenPlatformBuild` 从主场景生成 Android 观看副本：清空推理引用、禁用 tokenizer 与输入、移除模型和贴图展示，保留相同的网络对象及 ID。副本位于 `Assets/QwenWorld/Generated/Build`，每次重新生成。
+`Assets/QwenWorld/Scenes/QwenLaboratory.unity` 是唯一编辑源，沿用原 PC 场景 GUID。EditorBuildSettings 只保留它。`QwenPlatformBuild` 在 Android 与 iOS 构建时使用相同的观看端处理：清空推理引用、禁用 tokenizer 与输入、移除模型和贴图展示，保留相同的网络对象及 ID。需要生成观看副本时，副本位于 `Assets/QwenWorld/Generated/Build`，每次重新生成。
 
-安卓剔除还会清理 SDK 描述器的动态材质及预制体缓存，并重绑定复制后的烘焙光照元数据。否则即使删除模型物体，缓存或光照数据中的场景引用仍可能间接带入整套模型。构建审计要求观看副本的模型依赖为零。
+移动端剔除还会清理 SDK 描述器的动态材质及预制体缓存，并重绑定复制后的烘焙光照元数据。否则即使删除模型物体，缓存或光照数据中的场景引用仍可能间接带入整套模型。构建回调检查实际构建场景的模型依赖为零，残留时中止构建。
 
 `QwenWorldBuild` 通过 SDK 的公开 `Build` API 打本地包；测试场景由主场景复制并加入测试脚本，正常世界不携带回归脚本。所有入口均不调用上传 API。公开 SDK 面板直接构建时的平台处理另由 `IProcessSceneWithReport` 执行；其实际结果见验证报告。
+
+`VerifyIOS` 命令（Unity 关闭时运行）或 iOS 平台下的 `Qwen World > Validation > Build iOS viewer from main (no upload)` 菜单，通过主场景执行同一构建回调，检查包小于 100 MB、主场景仍启用 PC 推理，不会上传。
 
 ## 数据与资源
 
@@ -65,7 +67,7 @@ Observation 检查外围透明台阶、出生点、升降范围、菜单玻璃�
 
 ## 源码分发
 
-仓库使用 Apache-2.0；自有立牌和外环素材由项目所有者一并授权。第三方许可单独保留。
+自有代码及外环使用 Apache-2.0。千问 AI 立绘由 ZipZipPipe 发布于 Pixiv 148186519，保留原作“需署名、不可商用”的使用条件；抠图及表情处理另行记录，见 QwenGirl-Usage-Terms.md。该素材不属于 Apache-2.0，DeepSeek 专用的 CC BY-NC-SA 4.0 说明不套用到千问立绘。第三方许可单独保留。
 模型 PNG／EXR、tokenizer JSON 及其 Assets 下的 `.meta` 不提交，完整导入配置与 GUID
 保存在 Tools/Qwen35/model-payloads.lock.json。初始化先恢复资源，再编译 Udon，保留现成计算图与场景。
 SDK 从 VCC 恢复；Assets 下的 SDK 工具副本和 SerializedUdonPrograms 缓存不分发。
@@ -74,3 +76,9 @@ Setup 已检查主场景不依赖被排除的 SDK 工具副本。没有重新烘
 旧的个人来源路径已从公开文档移除，原始记录保留在维护者的本地备份。主场景解除世界 ID 绑定；
 原 ID 留在本地配置，可用菜单生成独立的本地发布副本。源码包通过候选文件过滤生成，
 不初始化 Git、不连接 GitHub、不上传。完整步骤见根目录中英文 README。
+
+`QwenInteractionPolish.ApplyBatch` 原位更新广告点击范围和会话布局：仅广告面透明 UI 可点击、键盘带阻尼、聊天框下移并渐显展开。保留家具位置，执行局部命中和动画检查，不运行推理、烘焙或构建。
+
+前方菜单以玩家相对位置跟随移动，保持拖动期间的朝向；世界控制器显式启用 3 的跳跃力度。暂停连线使用独立的预览标记与历史时间戳，单步切换不清空上一算子的消散。`QwenPlatformInteractionFix.ApplyBatch` 提供不启动推理的局部 ClientSim 验证。
+
+模型导入设置误改（如 SDK 的 8192 Auto Fix）可用 `Qwen World > Model > Restore original texture import settings`，按 `model-payloads.lock.json` 恢复模型纹理的 `.meta`，保留 GUID；只重导入被改变的设置，另核对嵌入贴图实际为 15520×4096、导入上限 16384。SDK 大贴图提示属于建议，模型数据纹理需保持原始尺寸与格式。

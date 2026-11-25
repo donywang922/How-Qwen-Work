@@ -40,7 +40,7 @@ namespace QwenWorld.Editor
             {
                 UdonSharpEditorUtility.CopyProxyToUdon(proxy, ProxySerializationPolicy.All);
                 var backing = UdonSharpEditorUtility.GetBackingUdonBehaviour(proxy);
-                string[] obsolete = proxy is QwenTextureRunner ? new[]{"stepLabels", "snapshotMaterial", "snapshot", "heatmapMaterial", "tensorLabel", "progressLabel", "selectedPass"} : proxy is QwenWorldController ? new[]{"modelText", "transcriptText", "modelDescription", "systemPrompt"} : proxy is QwenLocalization ? new[]{"replyLanguage", "replyLabel", "replyButton"} : proxy is QwenExhibitState ? new[]{"waitingPlayers"} : Array.Empty<string>();
+                string[] obsolete = proxy is QwenTextureRunner ? new[]{"stepLabels", "snapshotMaterial", "snapshot", "heatmapMaterial", "tensorLabel", "progressLabel", "selectedPass"} : proxy is QwenWorldController ? new[]{"modelText", "transcriptText", "modelDescription", "systemPrompt"} : proxy is QwenLocalization ? new[]{"replyLanguage", "replyLabel", "replyButton"} : proxy is QwenLocalMenu ? new[]{"mountOnArm", "mountButton", "mountLabel"} : proxy is QwenExhibitState ? new[]{"waitingPlayers"} : Array.Empty<string>();
                 foreach (string symbol in obsolete)
                     backing.publicVariables.RemoveVariable(symbol);
                 UnityEditor.EditorUtility.SetDirty(backing);

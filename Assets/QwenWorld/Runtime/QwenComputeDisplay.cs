@@ -16,6 +16,7 @@ namespace QwenWorld
         private Texture2D eventsTexture;
         private Color[] blank;
         private float[] eventTimes;
+        private bool[] previewEvents;
         private float[] layerExpiry = new float[24];
         private bool initialized, dirty, wasPaused;
         private int previewPass = -1, lastMask = -1;
@@ -45,6 +46,7 @@ namespace QwenWorld
             eventsTexture.wrapMode = TextureWrapMode.Clamp;
             blank = new Color[width];
             eventTimes = new float[width];
+            previewEvents = new bool[width];
             for (int i = 0; i < width; i++)
             {
                 blank[i] = new Color(-1000, 0, 0, 0);
@@ -64,7 +66,10 @@ namespace QwenWorld
             {
                 eventsTexture.SetPixels(blank);
                 for (int i = 0; i < eventTimes.Length; i++)
+                {
                     eventTimes[i] = -1000;
+                    previewEvents[i] = false;
+                }
                 dirty = true;
             }
 
@@ -74,22 +79,27 @@ namespace QwenWorld
             previewPass = -1;
         }
 
-        private void ClearActivity()
+        private void ReleasePreview()
         {
             if (eventsTexture == null)
                 return;
-            eventsTexture.SetPixels(blank);
             for (int i = 0; i < eventTimes.Length; i++)
-                eventTimes[i] = -1000;
-            dirty = true;
+                if(previewEvents[i])
+                {
+                    previewEvents[i]=false;
+                    eventTimes[i]=Time.time;
+                    eventsTexture.SetPixel(i,0,new Color(eventTimes[i],0,0,1));
+                    dirty=true;
+                }
         }
 
         private void Mark(int eventId, bool sticky)
         {
             if (eventsTexture == null || eventId < 0 || eventId >= resourceCount * 2)
                 return;
-            eventTimes[eventId] = Time.time;
-            eventsTexture.SetPixel(eventId, 0, new Color(Time.time, sticky ? 1 : 0, 0, 1));
+            if(sticky) previewEvents[eventId]=true;
+            else eventTimes[eventId] = Time.time;
+            eventsTexture.SetPixel(eventId, 0, new Color(eventTimes[eventId], previewEvents[eventId] ? 1 : 0, 0, 1));
             dirty = true;
         }
 
@@ -109,7 +119,7 @@ namespace QwenWorld
                 Initialize();
             if (wasPaused)
             {
-                ClearActivity();
+                ReleasePreview();
                 wasPaused = false;
                 previewPass = -1;
             }
@@ -121,6 +131,17 @@ namespace QwenWorld
                 if (layer >= 0 && layer < 24)
                     layerExpiry[layer] = Time.time + .12f;
             }
+        }
+
+        private void PreviewPausedPass(int pass)
+        {
+            if(wasPaused&&previewPass==pass) return;
+            // Unpin the previous preview into a timed pulse; retain its decay while
+            // pinning the next operator. Shared read/write edges remain fully previewed.
+            ReleasePreview();
+            MarkPass(pass,true);
+            wasPaused=true;
+            previewPass=pass;
         }
 
         public override void PostLateUpdate()
@@ -143,19 +164,13 @@ namespace QwenWorld
                             mask = 1 << layer;
                     }
 
-                    if (!wasPaused || previewPass != next)
-                    {
-                        ClearActivity();
-                        MarkPass(next, true);
-                        wasPaused = true;
-                        previewPass = next;
-                    }
+                    PreviewPausedPass(next);
                 }
                 else
                 {
                     if (wasPaused)
                     {
-                        ClearActivity();
+                        ReleasePreview();
                         wasPaused = false;
                         previewPass = -1;
                     }
@@ -164,6 +179,11 @@ namespace QwenWorld
                         if (Time.time < layerExpiry[layer])
                             mask |= 1 << layer;
                 }
+            }
+
+            else if(wasPaused)
+            {
+                ReleasePreview(); wasPaused=false; previewPass=-1;
             }
 
             bool busy = local && runner.running, paused = busy && runner.paused;

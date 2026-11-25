@@ -14,8 +14,7 @@ namespace QwenWorld
         public const int PAUSE = 4;
         public const int RESUME = 5;
         public const int STEP = 6;
-        public const int ARM = 7;
-        public const int FRONT = 8;
+        // Slots 7 and 8 are reserved to preserve serialized localization keys.
         public const int READY = 9;
         public const int WAIT = 10;
         public const int VIEWER = 11;
@@ -73,8 +72,8 @@ namespace QwenWorld
             "暂停", "Pause", "一時停止", "일시 정지", // PAUSE
             "继续", "Resume", "再開", "계속", // RESUME
             "单算子", "Step operator", "演算を1つ実行", "연산 한 단계", // STEP
-            "位置：左手臂", "Mount: left arm", "位置：左腕", "위치: 왼팔", // ARM
-            "位置：前方", "Mount: in front", "位置：前方", "위치: 정면", // FRONT
+            "", "", "", "", // Reserved
+            "", "", "", "", // Reserved
             "就绪 · 等待输入", "Ready · Ask a question", "準備完了 · 入力待ち", "준비 완료 · 입력 대기", // READY
             "等待输入。", "Waiting for a question.", "入力を待っています。", "질문을 기다리는 중입니다.", // WAIT
             "观看端", "Viewer", "閲覧のみ", "보기 전용", // VIEWER
@@ -109,7 +108,7 @@ namespace QwenWorld
             "嵌入 / 输出", "Embedding / output", "埋め込み / 出力", "임베딩 / 출력", // EMBEDDING
             "算子 {0}/{1}", "op {0}/{1}", "演算 {0}/{1}", "연산 {0}/{1}", // OPERATOR
             "操作与展示说明", "Controls and display", "操作と表示について", "조작 및 표시 안내", // HELP_TITLE
-            "Tab / 双击板机：打开菜单。\n握拳与放松的双手靠近千问：显示贴图。\n键盘：靠近获得权限，走远后自动交接。\n平台：站上白地后拖动滑条，掉落会复位。\nCRT 和读写线仅在执行端显示。四边描边代表读，四角代表写。\n核心有24层；暂停时显示下一个算子。", "Tab / double trigger: open menu.\nFist + relaxed hand near Qwen: show textures.\nKeyboard: approach to claim; walk away to pass it on.\nDeck: step onto white floor, then raise slider. Falling resets it.\nCRT data and lines are local. Edges = read; corners = write.\nCore: 24 layers. Pause previews the next operator.", "Tab / トリガー2回：メニュー。\nQwenの近くで片手を握り、もう片手を開いて近づけるとテクスチャを表示。\n入力権限は近づくと取得し、離れると自動で交代。\n白い床に乗り、スライダーで足場を上げます。落ちるとリセット。\nCRTと線は実行側のみ。辺の枠は読み込み、角の枠は書き込み。\nコアは24層。一時停止中は次の演算を表示。", "Tab / 트리거 두 번: 메뉴 열기.\nQwen 근처에서 한 손은 주먹, 다른 손은 펴서 모으면 텍스처 표시.\n키보드: 가까이 가면 권한 획득, 멀어지면 자동 인계.\n흰 바닥 위에서 슬라이더로 발판 높이 조절. 떨어지면 초기화.\nCRT와 선은 실행 측에만 표시. 변 테두리는 읽기, 모서리는 쓰기.\n코어는 24개 레이어. 일시 정지하면 다음 연산 표시.", // HELP_BODY
+            "Tab / 双击板机：打开菜单。\n握拳与放松的双手靠近千问：显示贴图。\n键盘：靠近获得权限，走远后自动交接。\n平台：站上白地后拖动滑条，掉落会复位。\nCRT 和读写线仅在执行端显示。四边描边代表读，四角代表写。\n核心有24层；暂停时显示下一个算子。\n\nAI立绘：ZipZipPipe · Pixiv 148186519\n已抠图、修改表情 · 署名使用，不可商用。", "Tab / double trigger: open menu.\nFist + relaxed hand near Qwen: show textures.\nKeyboard: approach to claim; walk away to pass it on.\nDeck: step onto white floor, then raise slider. Falling resets it.\nCRT data and lines are local. Edges = read; corners = write.\nCore: 24 layers. Pause previews the next operator.\n\nAI art: ZipZipPipe · Pixiv 148186519\nCutout / expression edits. Credit; noncommercial.", "Tab / トリガー2回：メニュー。\nQwenの近くで片手を握り、もう片手を開いて近づけるとテクスチャを表示。\n入力権限は近づくと取得し、離れると自動で交代。\n白い床に乗り、スライダーで足場を上げます。落ちるとリセット。\nCRTと線は実行側のみ。辺の枠は読み込み、角の枠は書き込み。\nコアは24層。一時停止中は次の演算を表示。\n\nAI立ち絵：ZipZipPipe · Pixiv 148186519\n背景除去・表情変更。要クレジット・非商用。", "Tab / 트리거 두 번: 메뉴 열기.\nQwen 근처에서 한 손은 주먹, 다른 손은 펴서 모으면 텍스처 표시.\n키보드: 가까이 가면 권한 획득, 멀어지면 자동 인계.\n흰 바닥 위에서 슬라이더로 발판 높이 조절. 떨어지면 초기화.\nCRT와 선은 실행 측에만 표시. 변 테두리는 읽기, 모서리는 쓰기.\n코어는 24개 레이어. 일시 정지하면 다음 연산 표시.\n\nAI 일러스트: ZipZipPipe · Pixiv 148186519\n배경 제거·표정 수정. 출처 표시·비상업용.", // HELP_BODY
             "停止", "Stop", "停止", "중지", // STOP
         };
         public void Start() { Apply(); }

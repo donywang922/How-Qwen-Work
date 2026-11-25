@@ -1,5 +1,5 @@
 param(
-    [ValidateSet('Test','Compile','Export','Bake','Rebuild','Validate','Smoke','Preview','Motion','Console','Observation','Localization','Cleanup','Audit','BuildPC','BuildAndroid','BuildAll','VerifyAndroid','NativeTest','Restore','Setup','Reference','Summary','SourceCheck','SourcePackage')]
+    [ValidateSet('Test','Compile','Export','Bake','Rebuild','Validate','Smoke','Preview','Motion','Console','Observation','Localization','Cleanup','Audit','BuildPC','BuildAndroid','BuildAll','VerifyAndroid','VerifyIOS','NativeTest','Restore','Setup','Reference','Summary','SourceCheck','SourcePackage')]
     [string]$Action='Test',
     [string]$DataRoot='',
     [string]$UnityPath='',
@@ -80,6 +80,7 @@ try {
         'BuildPC' { Invoke-Unity Win64 QwenWorld.Editor.QwenWorldBuild.BuildPC QWEN_BUNDLE_READY }
         'BuildAndroid' { Invoke-Unity Android QwenWorld.Editor.QwenWorldBuild.BuildAndroid QWEN_BUNDLE_READY }
         'VerifyAndroid' { Invoke-Unity Android QwenWorld.Editor.QwenWorldBuild.ValidateAndroidFromMainBatch QWEN_DIRECT_ANDROID_BUILD_PASSED }
+        'VerifyIOS' { Invoke-Unity iOS QwenWorld.Editor.QwenWorldBuild.ValidateIOSFromMainBatch QWEN_DIRECT_IOS_BUILD_PASSED }
         'NativeTest' { Invoke-Unity Win64 QwenWorld.Editor.QwenWorldBuild.BuildAndTest QWEN_BUNDLE_READY }
         'Restore' { Invoke-Unity Win64 QwenWorld.Editor.QwenWorldBuild.RestoreMainScene QWEN_WORKSPACE_RESTORED }
         'BuildAll' {

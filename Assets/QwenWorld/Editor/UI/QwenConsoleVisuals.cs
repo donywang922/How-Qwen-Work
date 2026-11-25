@@ -15,6 +15,9 @@ namespace QwenWorld.Editor
     {
         public const float OuterRadius = 1.41f, InnerRadius = 1.05f, KeyboardRadius = 1.23f;
         const string Folder = QwenSceneInstaller.Folder;
+        public const float MessageBaseHeight = 1.56f, MessageTierSpacing = .38f;
+        public const float InputScale = .0006f;
+        public const int InputWidth = 500, InputHeight = 320, MessageHeight = 360;
         public static void ConfigureKeyboard(QwenSocialUI social, Material white)
         {
             var keyboard = GameObject.Find("Shared white keyboard");
@@ -117,10 +120,28 @@ namespace QwenWorld.Editor
         {
             var social = UnityEngine.Object.FindObjectOfType<QwenSocialUI>();
             var menu = UnityEngine.Object.FindObjectOfType<QwenLocalMenu>();
+            ConfigureConversationProgress(social);
+            var menuRect = menu.menuRoot.GetComponent<RectTransform>();
+            menuRect.sizeDelta = new Vector2(480,415);
+            menu.menuRoot.transform.Find("White panel").GetComponent<RectTransform>().sizeDelta = menuRect.sizeDelta;
+            menu.menuRoot.GetComponent<BoxCollider>().size = new Vector3(480,415,1);
+            menu.stateLabel.rectTransform.anchoredPosition = new Vector2(24,-198);
+            menu.stateLabel.rectTransform.sizeDelta = new Vector2(432,68);
+            menu.stateLabel.fontSize = 18;
+            menu.stateLabel.text = "就绪 · 等待输入";
+            MoveProgressY(menu.heightLabel.transform,282);
+            MoveProgressY(menu.heightSlider.transform,330);
+            MoveProgressY(menu.menuRoot.transform.Find("Lowest"),372);
+            MoveProgressY(menu.menuRoot.transform.Find("Highest"),372);
+            if (social.controller.localization != null) QwenLocalizationBuilder.ConfigureScene();
+        }
+
+        static void ConfigureConversationProgress(QwenSocialUI social)
+        {
             var status = social.controller.statusText;
-            status.rectTransform.anchoredPosition = new Vector2(24,-316);
-            status.rectTransform.sizeDelta = new Vector2(592,60);
-            status.fontSize = 18;
+            status.rectTransform.anchoredPosition = new Vector2(20,-214);
+            status.rectTransform.sizeDelta = new Vector2(460,44);
+            status.fontSize = 14;
             status.text = "就绪 · 等待输入";
             social.panelProgress = new Text[social.panels.Length];
             for (int i = 0; i < social.panels.Length; i++)
@@ -132,7 +153,7 @@ namespace QwenWorld.Editor
                 label.transform.SetParent(panel,false);
                 var rect = label.rectTransform;
                 rect.anchorMin = rect.anchorMax = rect.pivot = new Vector2(0,1);
-                rect.anchoredPosition = new Vector2(24,-440);
+                rect.anchoredPosition = new Vector2(24,-324);
                 rect.sizeDelta = new Vector2(panel.sizeDelta.x - 48,26);
                 label.font = status.font; label.material = status.material;
                 label.fontSize = 14; label.color = new Color(.65f,.85f,.95f);
@@ -142,20 +163,49 @@ namespace QwenWorld.Editor
                 label.supportRichText = false; label.text = "就绪 · 等待输入";
                 social.panelProgress[i] = label;
             }
-            var menuRect = menu.menuRoot.GetComponent<RectTransform>();
-            menuRect.sizeDelta = new Vector2(480,485);
-            menu.menuRoot.transform.Find("White panel").GetComponent<RectTransform>().sizeDelta = menuRect.sizeDelta;
-            menu.menuRoot.GetComponent<BoxCollider>().size = new Vector3(480,485,1);
-            menu.stateLabel.rectTransform.anchoredPosition = new Vector2(24,-198);
-            menu.stateLabel.rectTransform.sizeDelta = new Vector2(432,68);
-            menu.stateLabel.fontSize = 18;
-            menu.stateLabel.text = "就绪 · 等待输入";
-            MoveProgressY(menu.heightLabel.transform,282);
-            MoveProgressY(menu.heightSlider.transform,330);
-            MoveProgressY(menu.menuRoot.transform.Find("Lowest"),372);
-            MoveProgressY(menu.menuRoot.transform.Find("Highest"),372);
-            MoveProgressY(menu.mountButton.transform,415);
-            if (social.controller.localization != null) QwenLocalizationBuilder.ConfigureScene();
+        }
+
+        public static void ConfigureConversationLayout()
+        {
+            var social=UnityEngine.Object.FindObjectOfType<QwenSocialUI>();
+            if(social==null) return;
+            social.keyboardSmoothTime=.24f; social.keyboardDegreesPerSecond=540;
+            social.panelTransitionSeconds=.30f;
+            ArrangeMessageScreens(social);
+            ConfigureConversationProgress(social);
+            ConfigureInputLayout(social);
+            var fontMaterial=QwenGraphDisplayBuilder.Material(Folder+"/GlassText.mat","QwenWorld/UI/GlassText");
+            foreach(var panel in social.panels) ApplyScreen(panel.gameObject,fontMaterial);
+        }
+
+        public static void ConfigureInputLayout(QwenSocialUI social)
+        {
+            var root=(RectTransform)social.inputRoot.transform;
+            root.sizeDelta=new Vector2(InputWidth,InputHeight);
+            root.localScale=Vector3.one*InputScale;
+            root.localPosition=new Vector3(0,1.17f,KeyboardRadius);
+            root.localRotation=Quaternion.Euler(12,180,0);
+            root.GetComponent<BoxCollider>().size=new Vector3(InputWidth,InputHeight,1);
+            root.Find("White panel").GetComponent<RectTransform>().sizeDelta=root.sizeDelta;
+            var title=root.GetComponentsInChildren<Text>(true).First(t=>t.transform.parent==root&&Mathf.Abs(t.rectTransform.anchoredPosition.y+18)<.1f);
+            title.rectTransform.anchoredPosition=new Vector2(20,-18); title.rectTransform.sizeDelta=new Vector2(460,36); title.fontSize=23;
+            var field=social.controller.promptInput;
+            field.GetComponent<RectTransform>().anchoredPosition=new Vector2(20,-62);
+            field.GetComponent<RectTransform>().sizeDelta=new Vector2(460,146);
+            foreach(var text in field.GetComponentsInChildren<Text>(true))
+            {
+                text.rectTransform.anchoredPosition=new Vector2(12,-8); text.rectTransform.sizeDelta=new Vector2(436,130);
+                text.fontSize=text==field.textComponent?23:21;
+            }
+            var status=social.controller.statusText;
+            status.rectTransform.anchoredPosition=new Vector2(20,-214); status.rectTransform.sizeDelta=new Vector2(460,44); status.fontSize=14;
+            var buttons=new[]{social.controller.sendButton,root.Find("Stop generation").GetComponent<Button>(),root.Find("收起").GetComponent<Button>()};
+            for(int i=0;i<buttons.Length;i++)
+            {
+                var rect=buttons[i].GetComponent<RectTransform>(); rect.anchoredPosition=new Vector2(20+i*158,-266); rect.sizeDelta=new Vector2(144,42);
+                var label=buttons[i].GetComponentInChildren<Text>(); label.rectTransform.anchoredPosition=new Vector2(8,0); label.rectTransform.sizeDelta=new Vector2(128,42); label.fontSize=20;
+            }
+            ApplyScreen(root.gameObject,QwenGraphDisplayBuilder.Material(Folder+"/GlassText.mat","QwenWorld/UI/GlassText"));
         }
 
         static void MoveProgressY(Transform target,float y)
@@ -177,18 +227,21 @@ namespace QwenWorld.Editor
                 bool inner = i % 2 == 1;
                 float width = inner ? 360 : 560;
                 float bodyWidth = width - 60;
-                Vector3 position = radial * (inner ? innerRadius : outerRadius) + Vector3.up * (1.93f + (i / columns) * .50f);
+                Vector3 position = radial * (inner ? innerRadius : outerRadius) + Vector3.up * (MessageBaseHeight + (i / columns) * MessageTierSpacing);
                 var panel = (RectTransform)social.panels[i];
                 panel.SetPositionAndRotation(position, Quaternion.LookRotation(-radial));
-                panel.sizeDelta = new Vector2(width, 480);
+                panel.sizeDelta = new Vector2(width, MessageHeight);
                 social.slotPositions[i] = position;
-                panel.Find("White panel").GetComponent<RectTransform>().sizeDelta = new Vector2(width, 480);
-                social.panelCaption[i].rectTransform.sizeDelta = new Vector2(width - 48, 52);
+                panel.Find("White panel").GetComponent<RectTransform>().sizeDelta = new Vector2(width, MessageHeight);
+                social.panelCaption[i].rectTransform.sizeDelta = new Vector2(width - 48, 44);
                 social.panelCaption[i].horizontalOverflow = HorizontalWrapMode.Wrap;
                 social.panelCaption[i].verticalOverflow = VerticalWrapMode.Truncate;
                 var viewport = social.panelContent[i].parent.GetComponent<RectTransform>();
-                viewport.sizeDelta = new Vector2(bodyWidth, 350);
-                social.panelContent[i].sizeDelta = new Vector2(bodyWidth, 350);
+                viewport.anchoredPosition = new Vector2(30,-74);
+                viewport.sizeDelta = new Vector2(bodyWidth, 236);
+                social.panelContent[i].sizeDelta = new Vector2(bodyWidth, 236);
+                social.panelText[i].fontSize = 21;
+                social.panelCaption[i].fontSize = 22;
                 social.panelText[i].horizontalOverflow = HorizontalWrapMode.Wrap;
                 social.panelText[i].verticalOverflow = VerticalWrapMode.Truncate;
             }

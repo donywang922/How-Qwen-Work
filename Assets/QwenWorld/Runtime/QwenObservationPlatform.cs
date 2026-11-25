@@ -19,6 +19,7 @@ namespace QwenWorld
         public float hiddenHeight = -.04f;
         private float targetHeight = -.04f, currentHeight = -.04f, nextLabel, hintUntil;
         private bool settingSlider, hasRidden, jumping, initialized;
+        private float jumpBlockUntil;
 
         public void Start()
         {
@@ -47,6 +48,7 @@ namespace QwenWorld
         {
             targetHeight = currentHeight = hiddenHeight;
             hasRidden = jumping = false;
+            jumpBlockUntil=0;
             settingSlider = true;
             if (heightSlider != null) heightSlider.value = 0;
             settingSlider = false;
@@ -112,7 +114,7 @@ namespace QwenWorld
             }
 
             bool onSurface = inside && Mathf.Abs(feet.y - Mathf.Max(0, currentHeight)) < .18f;
-            if (jumping && player.GetVelocity().y <= 0) jumping = false;
+            if (jumping && Time.unscaledTime>=jumpBlockUntil && player.IsPlayerGrounded() && player.GetVelocity().y <= 0) jumping = false;
             bool carry = onSurface && !jumping && player.GetVelocity().y < .5f;
             if (carry && currentHeight > .01f) hasRidden = true;
             float before = currentHeight;
@@ -135,7 +137,13 @@ namespace QwenWorld
 
         public override void InputJump(bool value, UdonInputEventArgs args)
         {
-            if (value) jumping = true;
+            if (value)
+            {
+                jumping = true;
+                // Input precedes the physics jump impulse: do not immediately clear
+                // this latch just because the previous frame's vertical speed was zero.
+                jumpBlockUntil=Time.unscaledTime+.20f;
+            }
         }
 
         public override void OnPlayerRespawn(VRCPlayerApi player)

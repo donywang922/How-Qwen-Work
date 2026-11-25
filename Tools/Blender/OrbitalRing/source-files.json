@@ -1,0 +1,26 @@
+{
+  "blenderVersion": "5.3.0",
+  "license": "Apache-2.0",
+  "files": [
+    {
+      "file": "Orbital_Ring_Source.blend",
+      "triangles": 474944,
+      "meshObjects": 1,
+      "materialCount": 1,
+      "packedImages": 5,
+      "linkedLibraries": 0,
+      "geometryUnchanged": true,
+      "removedPrivateTextBlocks": []
+    },
+    {
+      "file": "Orbital_Ring_20K_Distant.blend",
+      "triangles": 19954,
+      "meshObjects": 1,
+      "materialCount": 1,
+      "packedImages": 5,
+      "linkedLibraries": 0,
+      "geometryUnchanged": true,
+      "removedPrivateTextBlocks": []
+    }
+  ]
+}

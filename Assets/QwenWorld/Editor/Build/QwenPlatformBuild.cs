@@ -14,18 +14,26 @@ using VRC.SDKBase.Network;
 
 namespace QwenWorld.Editor
 {
-    /// <summary>One authored world; Android is a deterministic build-time projection.</summary>
+    /// <summary>One authored world; mobile platforms use the same viewer projection.</summary>
     public sealed class QwenPlatformBuild : IProcessSceneWithReport
     {
         public int callbackOrder => -10000;
+        public static bool IsViewerTarget(BuildTarget target) => target == BuildTarget.Android || target == BuildTarget.iOS;
+
         public void OnProcessScene(Scene scene, BuildReport report)
         {
-            if (EditorApplication.isPlayingOrWillChangePlaymode || Application.isPlaying || EditorUserBuildSettings.activeBuildTarget != BuildTarget.Android)
+            var target = report != null ? report.summary.platform : EditorUserBuildSettings.activeBuildTarget;
+            if (EditorApplication.isPlayingOrWillChangePlaymode || Application.isPlaying || !IsViewerTarget(target))
                 return;
             if (QwenProject.Components<QwenWorldController>(scene).Length == 0)
                 return;
             StripInference(scene);
-            Debug.Log("QWEN_ANDROID_BUILD_SCENE_STRIPPED " + scene.path);
+            var models = EditorUtility.CollectDependencies(scene.GetRootGameObjects())
+                .Select(AssetDatabase.GetAssetPath)
+                .Where(p => p.StartsWith(QwenProject.Root + "/Models/", StringComparison.Ordinal)).Distinct().ToArray();
+            if (models.Length != 0)
+                throw new BuildFailedException(target + " build retained model resources: " + string.Join(", ", models));
+            Debug.Log("QWEN_MOBILE_BUILD_SCENE_STRIPPED " + target + " modelDependencies=0 " + scene.path);
         }
 
         public static string CreateViewerScene()
@@ -40,7 +48,7 @@ namespace QwenWorld.Editor
             }
 
             if (!AssetDatabase.CopyAsset(QwenProject.MainScene, QwenProject.ViewerScene))
-                throw new IOException("Could not create Android build scene from the main scene.");
+                throw new IOException("Could not create mobile viewer scene from the main scene.");
             var scene = EditorSceneManager.OpenScene(QwenProject.ViewerScene, OpenSceneMode.Single);
             StripInference(scene);
             CopyViewerLighting();
@@ -95,7 +103,7 @@ namespace QwenWorld.Editor
             QwenProject.ResetSdkBuildCache(scene);
             NetworkIDAssignment.ConfigureNetworkIDs(descriptor, out var errors, NetworkIDAssignment.SetError.IncompatibleTypes);
             if (errors.Count != 0)
-                throw new BuildFailedException("Android network IDs are inconsistent: " + errors.Count);
+                throw new BuildFailedException("Mobile viewer network IDs are inconsistent: " + errors.Count);
         }
 
         public static void ValidateViewerDependencies(string scenePath)
@@ -109,7 +117,7 @@ namespace QwenWorld.Editor
                 string diagnostic = QwenProject.DataPath("validation/refactor/viewer-dependency-causes.txt");
                 Directory.CreateDirectory(Path.GetDirectoryName(diagnostic));
                 File.WriteAllLines(diagnostic, causes);
-                throw new BuildFailedException("Android scene retained " + models.Length + " model dependencies. See viewer-dependency-causes.txt.");
+                throw new BuildFailedException("Mobile viewer scene retained " + models.Length + " model dependencies. See viewer-dependency-causes.txt.");
             }
         }
 

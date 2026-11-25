@@ -18,6 +18,7 @@ namespace QwenWorld
         public bool supportsInference = true;
         public int maxNewTokens = 64;
         public int maxPromptCharacters = 1200;
+        public float jumpImpulse = 3;
         public QwenExhibitState exhibit;
         public QwenLocalization localization;
         [UdonSynced]
@@ -41,11 +42,28 @@ namespace QwenWorld
         private string readableTranscript = "";
         public void Start()
         {
+            EnableLocalJump();
             if (runner != null)
                 runner.controller = this;
             if (sendButton != null)
                 sendButton.interactable = supportsInference;
             RefreshText();
+        }
+
+        private void EnableLocalJump()
+        {
+            var player=Networking.LocalPlayer;
+            if(Utilities.IsValid(player)) player.SetJumpImpulse(jumpImpulse);
+        }
+
+        public override void OnPlayerJoined(VRCPlayerApi player)
+        {
+            if(Utilities.IsValid(player)&&player.isLocal) EnableLocalJump();
+        }
+
+        public override void OnPlayerRespawn(VRCPlayerApi player)
+        {
+            if(Utilities.IsValid(player)&&player.isLocal) EnableLocalJump();
         }
 
         private bool IsLocalOwner()

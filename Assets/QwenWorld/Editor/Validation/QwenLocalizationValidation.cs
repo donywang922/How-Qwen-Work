@@ -82,6 +82,8 @@ namespace QwenWorld.Editor
             var runner = controller.runner;
             var social = locale.social;
             var menu = locale.menu;
+            Require(menu.menuRoot.transform.Find("Mount") == null,"Arm mounting control remains");
+            Require(menu.menuRoot.GetComponent<BoxCollider>().isTrigger,"Menu blocks player movement");
             var gallery = GameObject.Find(QwenTextureGalleryBuilder.RootName);
             if (gallery != null) gallery.SetActive(false);
             social.keyboardCaption.transform.parent.gameObject.SetActive(false);
@@ -102,6 +104,7 @@ namespace QwenWorld.Editor
                 Require(controller.GetProgressText().Contains("511/512") && controller.GetProgressText().Contains("300/849"),"Localized progress lost numeric data");
                 for (int key = 0; key < QwenLocalization.KeyCount; key++)
                 {
+                    if (key == 7 || key == 8) continue; // Removed mount labels; serialized key slots stay reserved.
                     string text = locale.T(key);
                     Require(text.Length > 0,"Missing translation " + language + ":" + key);
                     foreach (char c in text)
@@ -109,7 +112,7 @@ namespace QwenWorld.Editor
                 }
                 menu.menuRoot.SetActive(true); social.inputRoot.SetActive(true);
                 Canvas.ForceUpdateCanvases();
-                var checkedText = locale.labels.Concat(new[]{menu.visibilityLabel,menu.runLabel,menu.mountLabel,menu.stateLabel,menu.heightLabel,
+                var checkedText = locale.labels.Concat(new[]{menu.visibilityLabel,menu.runLabel,menu.stateLabel,menu.heightLabel,
                     controller.statusText,social.keyboardCaption}).Concat(locale.languageButtons.Select(b => b.GetComponentInChildren<Text>()));
                 foreach (var text in checkedText)
                     Require(text.preferredHeight <= text.rectTransform.rect.height + .5f,

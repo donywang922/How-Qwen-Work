@@ -1,13 +1,16 @@
 # How Qwen Work
 
 在 VRChat 世界中以 GPU 数据贴图运行 Qwen3.5-0.8B 文本模型，展示真实权重、暂存状态和算子读写。
-PC 本地推理，Android 观看共享聊天和核心状态。自有代码、立牌与外环素材采用 Apache-2.0；
+PC 本地推理，Android 观看共享聊天和核心状态。自有代码与外环素材采用 Apache-2.0；
+AI 立绘来自 [ZipZipPipe《AI娘化》](https://www.pixiv.net/artworks/148186519)，按原作者“**需署名、不可商用**”的条件随包提供，详见 [立绘使用说明](Docs/QwenGirl-Usage-Terms.md)。
+完整包包含不同许可的资源，并非全部 Apache-2.0；商业复用时需替换该立绘或另获授权。
 第三方模型、字体、SDK 和天空素材保留各自许可，见 [NOTICE](NOTICE) 和 [第三方说明](THIRD_PARTY_NOTICES.md)。
 
 ## 第一次获取源码
 
 需要 Unity **2022.3.22f1**、VRChat Creator Companion、Python **3.12**。
 通过 VCC 安装或恢复 Worlds SDK **3.10.6**，版本记录在 `Packages/vpm-manifest.json`。
+出生点画笔依赖 [QvPen / ureishi](https://github.com/ureishi/QvPen) **3.3.15**，同样通过 VCC 恢复。
 本仓库不分发 SDK 缓存，也不需要任何人的 SDK 登录信息。
 
 模型 PNG／EXR 和生成的 tokenizer JSON 不进入 Git。其他场景、材质、几何、烘焙光照、
@@ -77,4 +80,6 @@ Unity 路径可用 `-UnityPath`／`QWEN_UNITY_PATH` 指定，也会尝试寻找�
 脚本不会自动创建远程仓库、提交或上传。
 
 更多信息：[实现与维护](Docs/Qwen35-Implementation.md)、[场景规格](Docs/Qwen35-Central-Exhibit-Design.zh-CN.md)、
-[天空来源](Docs/Qwen35-Orbital-Sky.md)。
+[天空来源](Docs/Qwen35-Orbital-Sky.md)、[出生点长椅与资料灯箱](Docs/Qwen35-Spawn-Lounge.md)。
+
+外环高模、远景版 `.blend` 及建模／导出脚本已随源码提供，见 [Blender 源文件](Tools/Blender/OrbitalRing/README.md)。两份工程均内嵌贴图，放在 Assets 外，不给 Unity 增加 Blender 导入依赖。

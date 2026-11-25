@@ -223,6 +223,8 @@ namespace QwenWorld.Editor
             QwenSurfaceMaterials.ApplyToCurrentScene();
             QwenWalkwaysBuilder.Configure(root.transform, menu, descriptor);
             QwenLocalizationBuilder.ConfigureScene();
+            if (File.Exists("Assets/QwenWorld/Environment/SpawnLounge/ReferenceAtlas.png"))
+                QwenSpawnLoungeBuilder.ApplyToCurrentScene();
             menu.textureRoots = AllTransforms().Where(t => t.name == "Outer ring - static textures" || t.name == "Inner ring - live CRT").Select(t => t.gameObject).ToArray();
             if (descriptor != null)
             {

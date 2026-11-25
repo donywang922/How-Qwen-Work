@@ -26,15 +26,25 @@ namespace QwenWorld
         private bool rebuildPlayers = true, lastMine, inputCollapsed;
         private float nextPanelUpdate, nextCandidateRegistration;
         private float keyboardAngle = 180;
+        private float keyboardAngularVelocity;
         public float keyboardDegreesPerSecond = 540;
+        public float keyboardSmoothTime = .24f;
+        public float panelTransitionSeconds = .30f;
+        private float[] panelReveal;
+        private bool[] panelOpen;
+        private Vector3[] panelBaseScale;
         private string lastTranscript = "";
         public void Start()
         {
             if (keyboardPivot != null) keyboardAngle = keyboardPivot.eulerAngles.y;
             slotPlayerIds = new int[panels.Length];
+            panelReveal = new float[panels.Length];
+            panelOpen = new bool[panels.Length];
+            panelBaseScale = new Vector3[panels.Length];
             for (int i = 0; i < slotPlayerIds.Length; i++)
             {
                 slotPlayerIds[i] = -1;
+                panelBaseScale[i] = panels[i].localScale;
                 panels[i].gameObject.SetActive(false);
             }
 
@@ -128,8 +138,7 @@ namespace QwenWorld
             {
                 Vector3 delta = holder.GetPosition() - center.position;
                 float target = Mathf.Atan2(delta.x, delta.z) * Mathf.Rad2Deg;
-                keyboardAngle = Mathf.MoveTowardsAngle(keyboardAngle, target, keyboardDegreesPerSecond * Time.unscaledDeltaTime);
-                keyboardPivot.rotation = Quaternion.Euler(0, keyboardAngle, 0);
+                FollowKeyboard(target,Time.unscaledDeltaTime);
             }
 
             var local = Networking.LocalPlayer;
@@ -141,10 +150,7 @@ namespace QwenWorld
                 exhibit.ClaimKeyboardLocal();
             }
 
-            if (panelFade != null)
-                for (int i = 0; i < panelFade.Length; i++)
-                    if (panels[i].gameObject.activeSelf && panelFade[i].alpha < 1)
-                        panelFade[i].alpha = Mathf.MoveTowards(panelFade[i].alpha, 1, Time.unscaledDeltaTime * 7);
+            AnimatePanels(Time.unscaledDeltaTime);
 
             if (Time.unscaledTime < nextPanelUpdate)
                 return;
@@ -180,7 +186,7 @@ namespace QwenWorld
                     if (!Utilities.IsValid(p) || (p.GetPosition() - center.position).sqrMagnitude > 27.04f)
                     {
                         slotPlayerIds[s] = -1;
-                        panels[s].gameObject.SetActive(false);
+                        panelOpen[s] = false;
                     }
                 }
 
@@ -214,13 +220,12 @@ namespace QwenWorld
                 if (old >= 0)
                 {
                     slotPlayerIds[old] = -1;
-                    panels[old].gameObject.SetActive(false);
+                    panelOpen[old] = false;
                 }
 
                 slotPlayerIds[best] = player.playerId;
                 panelCaption[best].text = player.displayName;
-                panels[best].gameObject.SetActive(true);
-                panelFade[best].alpha = 0;
+                OpenPanel(best);
             }
 
             string transcript = controller == null ? "" : controller.GetTranscript();
@@ -242,6 +247,57 @@ namespace QwenWorld
                     panelContent[s].SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, height);
                     panelContent[s].anchoredPosition = new Vector2(0, Mathf.Max(0, height - viewport.rect.height));
                 }
+        }
+
+        private void FollowKeyboard(float target,float deltaTime)
+        {
+            float dt=Mathf.Clamp(deltaTime,0,.05f);
+            float smooth=Mathf.Max(.08f,keyboardSmoothTime);
+            float omega=2/smooth;
+            float error=Mathf.DeltaAngle(keyboardAngle,target);
+            float originalTarget=keyboardAngle+error;
+            float change=Mathf.Clamp(-error,-keyboardDegreesPerSecond*smooth,keyboardDegreesPerSecond*smooth);
+            float decay=Mathf.Exp(-omega*dt);
+            float temporary=(keyboardAngularVelocity+omega*change)*dt;
+            keyboardAngularVelocity=(keyboardAngularVelocity-omega*temporary)*decay;
+            float next=keyboardAngle-change+(change+temporary)*decay;
+            if((originalTarget-keyboardAngle>0)==(next>originalTarget))
+            {
+                next=originalTarget;
+                keyboardAngularVelocity=0;
+            }
+            keyboardAngle=Mathf.Repeat(next,360);
+            keyboardPivot.rotation=Quaternion.Euler(0,keyboardAngle,0);
+        }
+
+        private void OpenPanel(int index)
+        {
+            if(!panels[index].gameObject.activeSelf)
+            {
+                panelReveal[index]=0;
+                panelFade[index].alpha=0;
+                panels[index].localScale=panelBaseScale[index]*.88f;
+                panels[index].position=slotPositions[index]-Vector3.up*.035f;
+            }
+            panelOpen[index]=true;
+            panels[index].gameObject.SetActive(true);
+        }
+
+        private void AnimatePanels(float deltaTime)
+        {
+            if(panelReveal==null||panelFade==null) return;
+            float step=Mathf.Max(0,deltaTime)/Mathf.Max(.1f,panelTransitionSeconds);
+            for(int i=0;i<panels.Length;i++)
+            {
+                if(!panels[i].gameObject.activeSelf) continue;
+                panelReveal[i]=Mathf.MoveTowards(panelReveal[i],panelOpen[i]?1:0,step);
+                float t=panelReveal[i];
+                float eased=t*t*(3-2*t);
+                panelFade[i].alpha=eased;
+                panels[i].localScale=panelBaseScale[i]*Mathf.Lerp(.88f,1,eased);
+                panels[i].position=slotPositions[i]-Vector3.up*(.035f*(1-eased));
+                if(!panelOpen[i]&&t<=0) panels[i].gameObject.SetActive(false);
+            }
         }
     }
 }

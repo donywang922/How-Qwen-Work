@@ -1,0 +1,64 @@
+{
+  "links": [
+    {
+      "page": 0,
+      "title": "NASA 星图 / Deep Star Maps",
+      "url": "https://svs.gsfc.nasa.gov/4851/",
+      "qr": "LinkQR-00.png"
+    },
+    {
+      "page": 0,
+      "title": "NASA 地球 / Blue Marble",
+      "url": "https://science.nasa.gov/earth/earth-observatory/blue-marble-next-generation/base-map/",
+      "qr": "LinkQR-01.png"
+    },
+    {
+      "page": 0,
+      "title": "NASA 夜光 / Black Marble",
+      "url": "https://science.nasa.gov/earth/earth-observatory/earth-at-night/maps/",
+      "qr": "LinkQR-02.png"
+    },
+    {
+      "page": 1,
+      "title": "Qwen3.5-0.8B / Qwen",
+      "url": "https://huggingface.co/Qwen/Qwen3.5-0.8B",
+      "qr": "LinkQR-03.png"
+    },
+    {
+      "page": 1,
+      "title": "ShaderGPT / lox9973",
+      "url": "https://gitlab.com/lox9973/ShaderGPT",
+      "qr": "LinkQR-04.png"
+    },
+    {
+      "page": 1,
+      "title": "千问立绘 / ZipZipPipe",
+      "url": "https://www.pixiv.net/artworks/148186519",
+      "qr": "LinkQR-05.png"
+    },
+    {
+      "page": 2,
+      "title": "QvPen / ureishi",
+      "url": "https://github.com/ureishi/QvPen",
+      "qr": "LinkQR-06.png"
+    },
+    {
+      "page": 2,
+      "title": "VRChat Worlds SDK",
+      "url": "https://creators.vrchat.com/worlds/",
+      "qr": "LinkQR-07.png"
+    },
+    {
+      "page": 2,
+      "title": "UdonSharp",
+      "url": "https://udonsharp.docs.vrchat.com/",
+      "qr": "LinkQR-08.png"
+    },
+    {
+      "page": 2,
+      "title": "Creator Companion",
+      "url": "https://vcc.docs.vrchat.com/",
+      "qr": "LinkQR-09.png"
+    }
+  ]
+}
